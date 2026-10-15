@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101927">
-<title>FaceCheck | Attendance Prototype</title>
+<title>FaceCheck | Supabase Attendance</title>
 <style>
 :root{color-scheme:dark;--bg:#0b1220;--panel:#121e2f;--panel2:#17263a;--line:#2c3e55;--text:#edf5ff;--muted:#a5b4c8;--green:#4ade80;--cyan:#67e8f9;--red:#fb7185;--amber:#fbbf24}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -15%,#1a3550 0,var(--bg) 48%);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}.wrap{max-width:1120px;margin:auto;padding:20px 14px 40px}header{display:flex;align-items:center;gap:12px;margin:3px 0 18px}.logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#34d39917;border:1px solid #34d39955;color:var(--green);font-size:25px}h1{font-size:clamp(22px,4vw,29px);letter-spacing:-.04em;line-height:1.05;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:5px}.tag{margin-left:auto;border:1px solid var(--line);border-radius:999px;padding:7px 10px;color:var(--cyan);font-size:11px;white-space:nowrap}.intro{font-size:13px;color:#ccdae9;line-height:1.55;margin:0 0 17px}.layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.95fr);gap:15px;align-items:start}.stack{display:flex;flex-direction:column;gap:15px}.panel{background:linear-gradient(180deg,#142236f5,#101a29f5);border:1px solid var(--line);border-radius:19px;overflow:hidden;box-shadow:0 15px 45px #0002}.head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:15px 16px;border-bottom:1px solid var(--line)}.head h2{font-size:14px;margin:0}.small{font-size:11px;color:var(--muted)}.cam{position:relative;background:#050a10;aspect-ratio:4/3;display:grid;place-items:center;overflow:hidden}video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}.placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;padding:22px;color:#91a4bb}.placeholder .camicon{font-size:42px}.placeholder strong{color:#e1ebf8;font-size:14px}.placeholder span{max-width:285px;line-height:1.5;font-size:12px}.oval{pointer-events:none;position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:min(59%,260px);height:76%;border:2px dashed #4ade80bb;border-radius:48% 48% 45% 45%;box-shadow:0 0 0 999px #00000014}.live{position:absolute;top:11px;left:11px;display:flex;gap:7px;align-items:center;background:#07111ddd;border:1px solid #ffffff22;border-radius:999px;padding:7px 10px;font-size:10px}.dot{width:7px;height:7px;border-radius:50%;background:#64748b}.dot.on{background:var(--green);box-shadow:0 0 12px #4ade8088}.status{display:flex;gap:10px;padding:12px 15px;border-top:1px solid #24344a;color:#d3e2f2;font-size:12px;line-height:1.5;min-height:52px}.statusicon{width:24px;height:24px;flex:0 0 24px;border-radius:8px;background:#1c3447;display:grid;place-items:center;color:var(--cyan)}.body{padding:16px}.eyebrow{text-transform:uppercase;font-size:10px;font-weight:800;letter-spacing:.14em;color:var(--green)}.challengeTitle{font-size:clamp(22px,4vw,30px);font-weight:850;letter-spacing:-.045em;line-height:1.1;margin:8px 0}.desc{font-size:12px;color:var(--muted);line-height:1.55;margin:0 0 13px;min-height:35px}.actionbanner{border:1px solid #315341;background:#12372b55;border-radius:13px;padding:12px 13px;margin:12px 0;font-size:13px;line-height:1.4;color:#d1fae5}.progress{display:flex;gap:6px;margin:11px 0 15px}.progress span{height:5px;flex:1;background:#2b3b4e;border-radius:8px}.progress span.ok{background:linear-gradient(90deg,var(--green),var(--cyan))}button{width:100%;padding:12px 14px;border-radius:12px;border:0;font:inherit;font-weight:800;font-size:12px;cursor:pointer;margin-top:8px;transition:opacity .15s,transform .15s}button:active:not(:disabled){transform:scale(.99)}button:disabled{opacity:.42;cursor:not-allowed}.primary{background:linear-gradient(100deg,var(--green),var(--cyan));color:#06241b}.secondary{background:#1c2c40;border:1px solid #3b4d63;color:#e5eefb}.danger{background:#3c1f2a;border:1px solid #704052;color:#ffdbe2}.fields{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-bottom:8px}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}.field input{width:100%;min-width:0;padding:11px 12px;border:1px solid #354960;border-radius:10px;background:#0d1726;color:var(--text);font:inherit;font-size:13px}.checkrow{display:flex;gap:9px;align-items:flex-start;font-size:11px;line-height:1.45;color:#c5d2e2;margin:12px 0 5px}.checkrow input{margin-top:2px;accent-color:var(--green)}.subnote{font-size:11px;color:#94a7bc;line-height:1.55;margin-top:10px}.statusline{border:1px solid var(--line);border-radius:11px;padding:10px 12px;color:var(--muted);font-size:11px;line-height:1.5;margin-top:10px}.statusline.good{border-color:#246448;color:#bbf7d0;background:#103a2b42}.statusline.warn{border-color:#6b5322;color:#fde68a;background:#4b381927}.list{display:flex;flex-direction:column;gap:8px}.person,.record{border:1px solid #293d53;background:#0e1928;border-radius:11px;padding:11px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px}.person strong,.record strong{display:block;font-size:12px}.person span,.record span{display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.35}.pill{font-size:10px;white-space:nowrap;border-radius:99px;padding:6px 8px;background:#173629;color:#bbf7d0;border:1px solid #285743}.empty{font-size:12px;color:#8294a8;line-height:1.5;text-align:center;border:1px dashed #34475d;border-radius:12px;padding:18px}.log-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}.log-tools button{margin:0}.privacy{margin-top:15px;border:1px solid #66552a;background:#4a3a171f;color:#ded0a6;border-radius:13px;padding:12px 13px;font-size:11px;line-height:1.55}.privacy strong{color:#f8e7b3}footer{text-align:center;color:#71849a;font-size:10px;margin-top:16px}@media(max-width:800px){.layout{grid-template-columns:1fr}.tag{display:none}.wrap{padding:15px 11px 28px}.cam{max-height:55vh}.fields{grid-template-columns:1fr 1.2fr}}@media(max-width:390px){.fields{grid-template-columns:1fr}.head{padding:13px}.body{padding:13px}}
@@ -12,34 +12,61 @@
 </head>
 <body>
 <main class="wrap">
-<header><div class="logo" aria-hidden="true">◎</div><div><h1>FaceCheck</h1><div class="sub">Facial enrollment · Identity matching · Time In / Time Out</div></div><div class="tag">PROTOTYPE 0.3</div></header>
-<p class="intro">We'll register you as the first employee, then test whether a fresh camera scan matches your saved face template. This build stores the template and test attendance logs only in this browser on this device.</p>
+<header><div class="logo" aria-hidden="true">◎</div><div><h1>FaceCheck</h1><div class="sub">Facial enrollment · Identity matching · Time In / Time Out</div></div><div class="tag">SUPABASE CLOUD BUILD 0.4</div></header>
+<p class="intro">Cloud-connected prototype: employee face templates and attendance events are stored in your own Supabase project. Connect with a publishable key and sign in with your Supabase Auth owner account before enrolling an employee.</p>
+<section class="panel" id="cloudPanel" style="margin-bottom:15px">
+  <div class="head"><h2>Supabase database connection</h2><span class="small" id="cloudBadge">Not connected</span></div>
+  <div class="body">
+    <div class="fields" style="grid-template-columns:1fr;">
+      <div class="field"><label for="projectUrl">Supabase Project URL</label><input id="projectUrl" placeholder="https://your-project-ref.supabase.co" autocomplete="url" spellcheck="false"></div>
+      <div class="field"><label for="publishableKey">Publishable key (sb_publishable_…)</label><input id="publishableKey" placeholder="sb_publishable_…" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <button class="primary" id="connectBtn">Connect Supabase project</button>
+    <div class="statusline" id="cloudStatus">Step 1: Run the included SQL schema in Supabase SQL Editor, then paste your project URL and publishable key here. Use only an sb_publishable_ key — never a secret key.</div>
+    <p class="subnote">The publishable key is intended for browser apps and is protected by the database policies. Never paste an <code>sb_secret_</code> or service_role key here.</p>
+    <div id="authPanel" hidden style="margin-top:16px;border-top:1px solid var(--line);padding-top:15px">
+      <div class="eyebrow" id="authHeading">OWNER ACCOUNT</div>
+      <p class="subnote" style="margin:6px 0 12px">Create or sign in to your Supabase Auth owner account. The database uses Row Level Security to limit rows to this signed-in account.</p>
+      <div class="fields" style="grid-template-columns:1fr 1fr">
+        <div class="field"><label for="ownerEmail">Owner email</label><input id="ownerEmail" type="email" placeholder="you@example.com" autocomplete="username"></div>
+        <div class="field"><label for="ownerPassword">Password (8+ characters)</label><input id="ownerPassword" type="password" placeholder="Password" autocomplete="current-password"></div>
+      </div>
+      <div class="log-tools"><button class="primary" id="createAccountBtn">Create owner account</button><button class="secondary" id="signInBtn">Sign in</button></div>
+      <button class="danger" id="signOutBtn" hidden>Sign out</button>
+      <div class="statusline" id="authStatus">Connect to Supabase, then create your owner account or sign in.</div>
+    </div>
+  </div>
+</section>
 <div class="layout">
 <div class="stack">
 <section class="panel"><div class="head"><h2>Android front camera</h2><span class="small" id="cameraStatus">Not started</span></div><div class="cam"><video id="video" autoplay muted playsinline></video><div class="placeholder" id="placeholder"><div class="camicon">▣</div><strong>Camera preview appears here</strong><span>Use HTTPS in Chrome and allow camera permission when asked.</span></div><div class="oval" id="oval" hidden></div><div class="live"><span class="dot" id="dot"></span><span id="liveLabel">CAMERA OFF</span></div></div><div class="status"><div class="statusicon">✦</div><div id="statusText" role="status" aria-live="polite">Tap “Start camera & face engine” to begin. The camera starts before the recognition models load.</div></div><div class="body"><button class="primary" id="cameraBtn">Start camera & face engine</button><button class="secondary" id="stopBtn" disabled>Stop camera</button><div class="statusline" id="engineStatus">Face-recognition engine: not loaded</div></div></section>
-<section class="panel"><div class="head"><h2>Employee enrollment</h2><span class="small">Start with employee #001</span></div><div class="body"><div class="fields"><div class="field"><label for="employeeId">Employee ID</label><input id="employeeId" value="E001" maxlength="30" autocomplete="off"></div><div class="field"><label for="employeeName">Employee name</label><input id="employeeName" placeholder="Enter your name" maxlength="80" autocomplete="name"></div></div><label class="checkrow"><input id="consent" type="checkbox"><span>I understand this test creates a mathematical face template saved in this browser on this device. No face photo is saved to the attendance database in this prototype.</span></label><button class="primary" id="enrollBtn" disabled>Register my face as Employee #001</button><div class="subnote">Enrollment takes a random blink/head-turn challenge first, then samples your face several times. If this ID already exists, the existing template will be replaced only after confirmation.</div></div></section>
+<section class="panel"><div class="head"><h2>Employee enrollment</h2><span class="small">Start with employee #001</span></div><div class="body"><div class="fields"><div class="field"><label for="employeeId">Employee ID</label><input id="employeeId" value="E001" maxlength="30" autocomplete="off"></div><div class="field"><label for="employeeName">Employee name</label><input id="employeeName" placeholder="Enter your name" maxlength="80" autocomplete="name"></div></div><label class="checkrow"><input id="consent" type="checkbox"><span>I understand this app stores a mathematical face template in my Supabase project for biometric matching. It does not upload the face photo itself.</span></label><button class="primary" id="enrollBtn" disabled>Register my face as Employee #001</button><div class="subnote">Enrollment takes a random blink/head-turn challenge first, then stores several face descriptors in Supabase. If this employee ID already exists in your workspace, its template is replaced only after confirmation.</div></div></section>
 </div>
 <div class="stack">
 <section class="panel"><div class="head"><h2>Random live challenge</h2><span class="small" id="challengeStatus">Waiting</span></div><div class="body"><div class="eyebrow" id="eyebrow">READY</div><div class="challengeTitle" id="challengeTitle">Let's verify it's you.</div><p class="desc" id="challengeDesc">Each registration or attendance attempt chooses a random action. Complete it before the system captures and checks your face.</p><div class="actionbanner" id="actionBanner">Possible checks: blink once, blink twice, or turn your head slightly and return to center.</div><div class="progress"><span id="p1"></span><span id="p2"></span><span id="p3"></span></div><button class="primary" id="verifyBtn" disabled>Verify identity & Time In / Time Out</button><button class="secondary" id="retryBtn" hidden>Try another random challenge</button><p class="subnote">A blink or head turn is only a basic liveness check; it is not a guarantee against advanced photo/video spoofing.</p></div></section>
 <section class="panel"><div class="head"><h2>Registered employees</h2><span class="small" id="employeeCount">0 enrolled</span></div><div class="body"><div class="list" id="employeeList"><div class="empty">No employees registered yet. Your first face template will appear here.</div></div></div></section>
-<section class="panel"><div class="head"><h2>Recent attendance</h2><span class="small" id="recordCount">0 records</span></div><div class="body"><div class="list" id="attendanceList"><div class="empty">No Time In / Time Out records yet.</div></div><div class="log-tools" style="margin-top:10px"><button class="secondary" id="exportBtn">Export attendance CSV</button><button class="danger" id="clearBtn">Clear local test data</button></div></div></section>
+<section class="panel"><div class="head"><h2>Recent attendance</h2><span class="small" id="recordCount">0 records</span></div><div class="body"><div class="list" id="attendanceList"><div class="empty">No Time In / Time Out records yet.</div></div><div class="log-tools" style="margin-top:10px"><button class="secondary" id="exportBtn">Export attendance CSV</button><button class="secondary" id="refreshBtn">Refresh cloud records</button></div></div></section>
 </div>
 </div>
-<div class="privacy"><strong>Privacy / prototype warning:</strong> Face templates are biometric data. This demo keeps templates and logs in local browser storage, which is not a secure employee database and does not sync to other devices. Anyone with access to this browser may be able to use or erase the demo records. Do not use this prototype for official payroll or production attendance. A later version should use secure admin access, protected storage, audit logs, server timestamps, and a reviewed privacy process.</div>
+<div class="privacy"><strong>Privacy / prototype warning:</strong> Face descriptors are biometric data and are stored in the connected Supabase project. RLS limits records to the signed-in owner account, but this prototype loads that owner’s templates into the browser for matching. Do not use it for official payroll or multi-employee production attendance yet. A production shared kiosk should move template matching behind a secured backend, add role controls and audit logs, improve liveness detection, and implement the applicable privacy requirements.</div>
 <footer>FaceCheck · Standalone prototype · Does not connect to your inventory applications</footer>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (() => {
 'use strict';
 const $ = (id) => document.getElementById(id);
 const video = $('video');
-const DB_EMPLOYEES = 'facecheck_local_employees_v1';
-const DB_ATTENDANCE = 'facecheck_local_attendance_v1';
+const CONFIG_KEY = 'facecheck_supabase_public_config_v1';
+const TABLE_EMPLOYEES = 'facecheck_employees';
+const TABLE_TEMPLATES = 'facecheck_face_templates';
+const TABLE_ATTENDANCE = 'facecheck_attendance';
 const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
 const FACE_MATCH_THRESHOLD = 0.54; // Prototype threshold; calibrate using real testing before production.
 const detOpts = () => new window.faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 });
 let stream = null, modelsReady = false, modelsPromise = null, flowRunning = false, cameraBusy = false, retryMode = null;
-let employees = loadJson(DB_EMPLOYEES, []), attendance = loadJson(DB_ATTENDANCE, []), lastCaptureUrl = null;
+let employees = [], attendance = [], lastCaptureUrl = null;
+let supabaseClient = null, currentSession = null, cloudReady = false, authSubscription = null;
 const challenges = [
   { id:'blink1', title:'Blink once', description:'Close both eyes, then open them again. Keep your face inside the oval.', type:'blink', required:1 },
   { id:'blink2', title:'Blink twice', description:'Blink twice, opening your eyes fully between blinks.', type:'blink', required:2 },
@@ -58,14 +85,14 @@ function formatTime(iso) { const d=new Date(iso); return d.toLocaleString([], {m
 function renderEmployees() {
   const root=$('employeeList'); root.replaceChildren(); $('employeeCount').textContent=`${employees.length} enrolled`;
   if (!employees.length) { const e=document.createElement('div');e.className='empty';e.textContent='No employees registered yet. Your first face template will appear here.';root.append(e);return; }
-  [...employees].sort((a,b)=>a.id.localeCompare(b.id)).forEach(e=>{const row=document.createElement('div');row.className='person';const info=document.createElement('div');const name=document.createElement('strong');name.textContent=e.name;const detail=document.createElement('span');detail.textContent=`${e.id} · ${e.samples?.length || 0} face samples · template saved on this device`;info.append(name,detail);const pill=document.createElement('span');pill.className='pill';pill.textContent='ENROLLED';row.append(info,pill);root.append(row);});
+  [...employees].sort((a,b)=>a.id.localeCompare(b.id)).forEach(e=>{const row=document.createElement('div');row.className='person';const info=document.createElement('div');const name=document.createElement('strong');name.textContent=e.name;const detail=document.createElement('span');detail.textContent=`${e.id} · ${e.samples?.length || 0} face samples · template saved in Supabase`;info.append(name,detail);const pill=document.createElement('span');pill.className='pill';pill.textContent='ENROLLED';row.append(info,pill);root.append(row);});
 }
 function renderAttendance() {
   const root=$('attendanceList');root.replaceChildren();$('recordCount').textContent=`${attendance.length} records`;
   if (!attendance.length) { const e=document.createElement('div');e.className='empty';e.textContent='No Time In / Time Out records yet.';root.append(e);return; }
   [...attendance].slice(-8).reverse().forEach(r=>{const row=document.createElement('div');row.className='record';const info=document.createElement('div');const name=document.createElement('strong');name.textContent=`${r.name} · ${r.event.replace('_',' ')}`;const detail=document.createElement('span');detail.textContent=`${r.employeeId} · ${formatTime(r.timestamp)}`;info.append(name,detail);const pill=document.createElement('span');pill.className='pill';pill.textContent=r.event==='TIME_IN'?'IN':'OUT';row.append(info,pill);root.append(row);});
 }
-function refreshButtons() { const can=modelsReady && !!stream && !flowRunning; $('enrollBtn').disabled=!can; $('verifyBtn').disabled=!can || employees.length===0; $('stopBtn').disabled=!stream || flowRunning; $('cameraBtn').disabled=cameraBusy || (modelsReady && !!stream); $('cameraBtn').textContent=modelsReady && stream?'Camera & face engine ready':stream?'Retry face engine':'Start camera & face engine'; }
+function refreshButtons() { const can=modelsReady && !!stream && !!currentSession && cloudReady && !flowRunning; $('enrollBtn').disabled=!can; $('verifyBtn').disabled=!can || employees.length===0; $('stopBtn').disabled=!stream || flowRunning; $('cameraBtn').disabled=cameraBusy || (modelsReady && !!stream); $('cameraBtn').textContent=modelsReady && stream?'Camera & face engine ready':stream?'Retry face engine':'Start camera & face engine'; }
 async function loadFaceApiLibrary() {
   if (window.faceapi) return;
   await new Promise((resolve,reject)=>{
@@ -115,7 +142,7 @@ async function startCameraAndModels() {
 }
 async function stopCamera() {
   if(flowRunning)return;
-  if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;$('placeholder').hidden=false;$('oval').hidden=true;setCameraBadge(false,'CAMERA OFF');setStatus('Camera stopped. Your locally saved employee templates and attendance records remain on this device.');refreshButtons();
+  if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;$('placeholder').hidden=false;$('oval').hidden=true;setCameraBadge(false,'CAMERA OFF');setStatus('Camera stopped. Your employee templates and attendance records remain safely stored in your Supabase project.');refreshButtons();
 }
 async function readFaces(withDescriptors=false) {
   const chain=window.faceapi.detectAllFaces(video,detOpts()).withFaceLandmarks(true);
@@ -174,43 +201,139 @@ function capturePreview() {
 }
 function calcDistance(a,b){if(!a||!b||a.length!==b.length)return Infinity;let sum=0;for(let i=0;i<a.length;i++){const d=a[i]-b[i];sum+=d*d;}return Math.sqrt(sum);}
 function findBestMatch(querySamples){let best=null;for(const e of employees){const samples=(e.samples||[]);const distances=querySamples.map(q=>Math.min(...samples.map(s=>calcDistance(q,s))));const sorted=distances.sort((a,b)=>a-b);const score=sorted[Math.floor(sorted.length/2)]??Infinity;if(!best||score<best.distance)best={employee:e,distance:score};}return best;}
-function recordAttendance(employee){const today=localDateKey();const todays=attendance.filter(r=>r.employeeId===employee.id&&localDateKey(new Date(r.timestamp))===today).sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));const last=todays[todays.length-1];const event=last?.event==='TIME_IN'?'TIME_OUT':'TIME_IN';const row={employeeId:employee.id,name:employee.name,event,timestamp:new Date().toISOString(),source:'local-prototype'};attendance.push(row);saveJson(DB_ATTENDANCE,attendance);renderAttendance();return row;}
+async function recordAttendance(employee, challengeId, matchDistance){
+  if(!supabaseClient||!currentSession||!cloudReady)throw new Error('Connect and sign in to Supabase before recording attendance.');
+  const today=localDateKey();
+  const todays=attendance.filter(r=>r.employeeId===employee.id&&localDateKey(new Date(r.timestamp))===today).sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
+  const last=todays[todays.length-1];
+  const event=last?.event==='TIME_IN'?'TIME_OUT':'TIME_IN';
+  const payload={owner_id:currentSession.user.id,employee_id:employee.dbId,event_type:event,match_distance:matchDistance,liveness_challenge:challengeId,source:'android-kiosk-prototype'};
+  const {data,error}=await supabaseClient.from(TABLE_ATTENDANCE).insert(payload).select('id,employee_id,event_type,occurred_at,match_distance,liveness_challenge,source').single();
+  if(error)throw error;
+  const row={dbId:data.id,employeeId:employee.id,name:employee.name,event:data.event_type,timestamp:data.occurred_at,source:data.source,matchDistance:data.match_distance,challengeId:data.liveness_challenge};
+  attendance.push(row);attendance.sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));renderAttendance();return row;
+}
 async function enroll() {
   if(!modelsReady||!stream||flowRunning)return;
+  if(!supabaseClient||!currentSession||!cloudReady){setStatus('Connect to Supabase and sign in with your owner account before registering an employee.');return;}
   const id=$('employeeId').value.trim(),name=$('employeeName').value.trim();
   if(!id||!name){setStatus('Enter an employee ID and your name before enrolling.');return;}
-  if(!$('consent').checked){setStatus('Please check the consent box to confirm you understand the local biometric-template test.');return;}
-  const index=employees.findIndex(e=>e.id.toLowerCase()===id.toLowerCase());if(index>=0&&!confirm(`Employee ID ${id} already exists. Replace its saved face template?`))return;
+  if(!$('consent').checked){setStatus('Please check the consent box to confirm you understand the cloud biometric-template storage.');return;}
+  const normalizedId=id.toUpperCase();$('employeeId').value=normalizedId;const index=employees.findIndex(e=>e.id.toUpperCase()===normalizedId);
+  if(index>=0&&!confirm(`Employee ID ${id} already exists. Replace its saved face template in Supabase?`))return;
   flowRunning=true;retryMode='enroll';refreshButtons();
   try{
     const challenge=await runChallenge();if(!challenge){$('retryBtn').hidden=false;retryMode='enroll';return;}
-    setStatus('Challenge passed. Capturing several face samples for your local template…');const samples=await collectDescriptors(5);capturePreview();
-    const employee={id,name,samples,createdAt:new Date().toISOString(),templateVersion:1};
-    if(index>=0)employees[index]=employee;else employees.push(employee);
-    saveJson(DB_EMPLOYEES,employees);renderEmployees();setStatus(`${name} (${id}) is registered on this device. Now use “Verify identity & Time In / Time Out” to test a fresh match.`);$('eyebrow').textContent='ENROLLMENT COMPLETE';$('challengeStatus').textContent='Registered';$('actionBanner').textContent='Face template saved locally. No face photo was saved to local storage.';$('retryBtn').hidden=true;retryMode=null;
-  }catch(e){console.error(e);setStatus(`Enrollment could not finish: ${e.message}`);}
+    setStatus('Challenge passed. Capturing several face descriptors, then saving them to Supabase…');
+    const samples=await collectDescriptors(5);capturePreview();
+    const now=new Date().toISOString();
+    const {data:emp,error:empError}=await supabaseClient.from(TABLE_EMPLOYEES).upsert({owner_id:currentSession.user.id,employee_code:normalizedId,full_name:name,active:true,updated_at:now},{onConflict:'owner_id,employee_code'}).select('id,employee_code,full_name,active,created_at').single();
+    if(empError)throw empError;
+    const {error:templateError}=await supabaseClient.from(TABLE_TEMPLATES).upsert({owner_id:currentSession.user.id,employee_id:emp.id,descriptors:samples,template_version:1,updated_at:now},{onConflict:'employee_id,owner_id'});
+    if(templateError)throw templateError;
+    await loadCloudData();
+    setStatus(`${name} (${id}) is registered in Supabase. Now verify your face to test a cloud-backed Time In / Time Out record.`);
+    $('eyebrow').textContent='ENROLLMENT COMPLETE';$('challengeStatus').textContent='Registered';$('actionBanner').textContent='Face descriptors saved to your Supabase project. The face image itself is not stored in the database.';$('retryBtn').hidden=true;retryMode=null;
+  }catch(e){console.error(e);setStatus(`Cloud enrollment failed: ${e.message||e}`);}
   finally{flowRunning=false;refreshButtons();}
 }
 async function verifyAndClock() {
   if(!modelsReady||!stream||flowRunning||employees.length===0)return;
+  if(!supabaseClient||!currentSession||!cloudReady){setStatus('Connect to Supabase and sign in first.');return;}
   flowRunning=true;retryMode='verify';refreshButtons();
   try{
     const challenge=await runChallenge();if(!challenge){$('retryBtn').hidden=false;retryMode='verify';return;}
-    setStatus('Challenge passed. Comparing your live face against registered employee templates…');const query=await collectDescriptors(3);capturePreview();
+    setStatus('Challenge passed. Comparing your live face against templates loaded from Supabase…');const query=await collectDescriptors(3);capturePreview();
     const match=findBestMatch(query);
     if(!match||match.distance>FACE_MATCH_THRESHOLD){$('eyebrow').textContent='NO MATCH';$('challengeStatus').textContent='Not recognized';$('actionBanner').textContent='No registered employee matched confidently. No attendance record was created.';setStatus(`Face not recognized (match distance ${match?match.distance.toFixed(3):'unavailable'}; prototype limit ${FACE_MATCH_THRESHOLD}). Try again with steady lighting and the same distance as enrollment.`);$('retryBtn').hidden=false;retryMode='verify';return;}
-    const rec=recordAttendance(match.employee);$('eyebrow').textContent='IDENTITY VERIFIED';$('challengeStatus').textContent='Match confirmed';$('challengeTitle').textContent=`Welcome, ${match.employee.name}`;$('actionBanner').textContent=`${match.employee.id} · ${rec.event.replace('_',' ')} recorded locally at ${new Date(rec.timestamp).toLocaleTimeString()}.`;setStatus(`Recognized ${match.employee.name} (${match.employee.id}) with match distance ${match.distance.toFixed(3)}. Attendance event: ${rec.event.replace('_',' ')}.`);$('retryBtn').hidden=true;retryMode=null;
-  }catch(e){console.error(e);setStatus(`Verification could not finish: ${e.message}`);}
+    const rec=await recordAttendance(match.employee,challenge.id,match.distance);$('eyebrow').textContent='IDENTITY VERIFIED';$('challengeStatus').textContent='Match confirmed';$('challengeTitle').textContent=`Welcome, ${match.employee.name}`;$('actionBanner').textContent=`${match.employee.id} · ${rec.event.replace('_',' ')} saved to Supabase at ${new Date(rec.timestamp).toLocaleTimeString()}.`;setStatus(`Recognized ${match.employee.name} (${match.employee.id}) with match distance ${match.distance.toFixed(3)}. ${rec.event.replace('_',' ')} was saved to the cloud database.`);$('retryBtn').hidden=true;retryMode=null;
+  }catch(e){console.error(e);setStatus(`Cloud verification or attendance save failed: ${e.message||e}`);}
   finally{flowRunning=false;refreshButtons();}
 }
 function exportCsv(){if(!attendance.length){setStatus('There are no attendance records to export yet.');return;}const quote=v=>`"${String(v??'').replace(/"/g,'""')}"`;const rows=[['Employee ID','Employee Name','Event','Timestamp (local display)','Timestamp (ISO)'],...attendance.map(r=>[r.employeeId,r.name,r.event,formatTime(r.timestamp),r.timestamp])];const csv=rows.map(row=>row.map(quote).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`facecheck-attendance-${localDateKey()}.csv`;document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);}
-function clearLocalData(){if(!confirm('This permanently removes all FaceCheck employee templates and attendance logs saved in this browser. Continue?'))return;localStorage.removeItem(DB_EMPLOYEES);localStorage.removeItem(DB_ATTENDANCE);employees=[];attendance=[];renderEmployees();renderAttendance();$('capturedImage').removeAttribute('src');$('capturedImage').style.display='none';$('capturePlaceholder').hidden=false;setStatus('Local FaceCheck test data was cleared from this browser.');$('challengeTitle').textContent="Let's verify it's you.";$('actionBanner').textContent='Possible checks: blink once, blink twice, or turn your head slightly and return to center.';refreshButtons();}
-$('cameraBtn').addEventListener('click',startCameraAndModels);$('stopBtn').addEventListener('click',stopCamera);$('enrollBtn').addEventListener('click',enroll);$('verifyBtn').addEventListener('click',verifyAndClock);$('retryBtn').addEventListener('click',()=>{const mode=retryMode;$('retryBtn').hidden=true;if(mode==='enroll')enroll();else verifyAndClock();});$('exportBtn').addEventListener('click',exportCsv);$('clearBtn').addEventListener('click',clearLocalData);
+async function loadCloudData(){
+  if(!supabaseClient||!currentSession){cloudReady=false;refreshButtons();return;}
+  cloudReady=false;refreshButtons();$('cloudBadge').textContent='Loading records…';
+  try{
+    const [empResult,templateResult,attResult]=await Promise.all([
+      supabaseClient.from(TABLE_EMPLOYEES).select('id,employee_code,full_name,active,created_at').order('employee_code'),
+      supabaseClient.from(TABLE_TEMPLATES).select('id,employee_id,descriptors,template_version,created_at'),
+      supabaseClient.from(TABLE_ATTENDANCE).select('id,employee_id,event_type,occurred_at,match_distance,liveness_challenge,source').order('occurred_at',{ascending:true}).limit(1000)
+    ]);
+    if(empResult.error)throw empResult.error;if(templateResult.error)throw templateResult.error;if(attResult.error)throw attResult.error;
+    const templateMap=new Map((templateResult.data||[]).map(t=>[t.employee_id,t]));
+    employees=(empResult.data||[]).filter(e=>e.active!==false).map(e=>{const t=templateMap.get(e.id);return {dbId:e.id,id:e.employee_code,name:e.full_name,samples:Array.isArray(t?.descriptors)?t.descriptors:[],createdAt:e.created_at,templateVersion:t?.template_version||1};});
+    const employeeMap=new Map(employees.map(e=>[e.dbId,e]));
+    attendance=(attResult.data||[]).map(r=>{const e=employeeMap.get(r.employee_id);return {dbId:r.id,employeeId:e?.id||r.employee_id,name:e?.name||'Employee',event:r.event_type,timestamp:r.occurred_at,matchDistance:r.match_distance,challengeId:r.liveness_challenge,source:r.source};});
+    cloudReady=true;$('cloudBadge').textContent='Connected';$('cloudStatus').textContent='Connected to Supabase. Employee templates and attendance are loaded from the cloud.';$('cloudStatus').className='statusline good';
+    renderEmployees();renderAttendance();refreshButtons();
+    $('authStatus').textContent=`Signed in as ${currentSession.user.email}. Cloud records loaded.`;$('authStatus').className='statusline good';
+  }catch(e){
+    console.error(e);cloudReady=false;$('cloudBadge').textContent='Database error';$('cloudStatus').textContent=`Could not read FaceCheck tables: ${e.message||e}. Check that the included SQL schema ran successfully in this project.`;$('cloudStatus').className='statusline warn';refreshButtons();
+  }
+}
+function updateAuthUi(){
+  const signedIn=!!currentSession;
+  $('authPanel').hidden=!supabaseClient;
+  $('signOutBtn').hidden=!signedIn;
+  $('createAccountBtn').hidden=signedIn;$('signInBtn').hidden=signedIn;
+  $('ownerEmail').disabled=signedIn;$('ownerPassword').disabled=signedIn;
+  $('authHeading').textContent=signedIn?'OWNER ACCOUNT CONNECTED':'OWNER ACCOUNT';
+  if(signedIn){$('authStatus').textContent=`Signed in as ${currentSession.user.email}.`;$('authStatus').className='statusline good';}
+  else if(supabaseClient){$('authStatus').textContent='Create your owner account or sign in to load your cloud tables.';$('authStatus').className='statusline';}
+  else {$('authStatus').textContent='Connect your Supabase project first.';$('authStatus').className='statusline';}
+}
+async function connectSupabase(){
+  const url=$('projectUrl').value.trim().replace(/\/$/,'');const key=$('publishableKey').value.trim();
+  if(!url||!key){$('cloudStatus').textContent='Enter both the Supabase Project URL and the publishable key.';return;}
+  try{const parsed=new URL(url);if(parsed.protocol!=='https:')throw new Error('Use the HTTPS Supabase Project URL.');if(!key.startsWith('sb_publishable_'))throw new Error('Use only the Supabase publishable key beginning sb_publishable_. Do not use a secret key, service_role key, or a key beginning sb_secret_.');}
+  catch(e){$('cloudStatus').textContent=`Connection settings error: ${e.message}`;$('cloudStatus').className='statusline warn';return;}
+  if(!window.supabase||typeof window.supabase.createClient!=='function'){$('cloudStatus').textContent='The Supabase JS library did not load. Check internet access, reload, and retry.';$('cloudStatus').className='statusline warn';return;}
+  $('connectBtn').disabled=true;$('cloudStatus').textContent='Connecting to Supabase…';$('cloudStatus').className='statusline';
+  try{
+    if(authSubscription){authSubscription.unsubscribe();authSubscription=null;}
+    supabaseClient=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    saveJson(CONFIG_KEY,{url,key});
+    const {data,error}=await supabaseClient.auth.getSession();if(error)throw error;
+    currentSession=data.session||null;updateAuthUi();
+    $('cloudBadge').textContent='Project configured';$('cloudStatus').textContent='Supabase client configured. Now create your owner account or sign in. If you already ran the SQL schema and a session exists, records will load automatically.';$('cloudStatus').className='statusline good';
+    if(currentSession)await loadCloudData();
+  }catch(e){console.error(e);$('cloudBadge').textContent='Connection failed';$('cloudStatus').textContent=`Could not initialize Supabase: ${e.message||e}`;$('cloudStatus').className='statusline warn';}
+  finally{$('connectBtn').disabled=false;refreshButtons();}
+}
+async function createOwnerAccount(){
+  if(!supabaseClient){$('authStatus').textContent='Connect your Supabase project first.';return;}
+  const email=$('ownerEmail').value.trim(),password=$('ownerPassword').value;
+  if(!email||password.length<8){$('authStatus').textContent='Enter a valid email and a password of at least 8 characters.';$('authStatus').className='statusline warn';return;}
+  $('createAccountBtn').disabled=true;$('authStatus').textContent='Creating your Supabase Auth owner account…';
+  try{const redirectUrl=window.location.origin+window.location.pathname;const {data,error}=await supabaseClient.auth.signUp({email,password,options:{emailRedirectTo:redirectUrl}});if(error)throw error;
+    if(data.session){currentSession=data.session;updateAuthUi();await loadCloudData();}
+    else{$('authStatus').textContent='Account request submitted. If email confirmation is enabled in Supabase, open the confirmation email, then return and sign in.';$('authStatus').className='statusline good';}
+  }catch(e){$('authStatus').textContent=`Account creation failed: ${e.message||e}`;$('authStatus').className='statusline warn';}
+  finally{$('createAccountBtn').disabled=false;}
+}
+async function signInOwner(){
+  if(!supabaseClient){$('authStatus').textContent='Connect your Supabase project first.';return;}
+  const email=$('ownerEmail').value.trim(),password=$('ownerPassword').value;
+  if(!email||!password){$('authStatus').textContent='Enter your owner email and password.';$('authStatus').className='statusline warn';return;}
+  $('signInBtn').disabled=true;$('authStatus').textContent='Signing in…';
+  try{const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw error;currentSession=data.session;updateAuthUi();await loadCloudData();}
+  catch(e){$('authStatus').textContent=`Sign in failed: ${e.message||e}`;$('authStatus').className='statusline warn';}
+  finally{$('signInBtn').disabled=false;}
+}
+async function signOutOwner(){
+  if(!supabaseClient)return;
+  const {error}=await supabaseClient.auth.signOut();if(error){$('authStatus').textContent=`Sign out failed: ${error.message}`;return;}
+  currentSession=null;cloudReady=false;employees=[];attendance=[];renderEmployees();renderAttendance();updateAuthUi();refreshButtons();$('cloudBadge').textContent='Signed out';$('cloudStatus').textContent='Signed out. Cloud records remain in Supabase and were not deleted.';
+}
+$('cameraBtn').addEventListener('click',startCameraAndModels);$('stopBtn').addEventListener('click',stopCamera);$('enrollBtn').addEventListener('click',enroll);$('verifyBtn').addEventListener('click',verifyAndClock);$('retryBtn').addEventListener('click',()=>{const mode=retryMode;$('retryBtn').hidden=true;if(mode==='enroll')enroll();else verifyAndClock();});$('exportBtn').addEventListener('click',exportCsv);$('refreshBtn').addEventListener('click',loadCloudData);$('connectBtn').addEventListener('click',connectSupabase);$('createAccountBtn').addEventListener('click',createOwnerAccount);$('signInBtn').addEventListener('click',signInOwner);$('signOutBtn').addEventListener('click',signOutOwner);
+// Restore only the public project URL and publishable key; biometric templates and logs are never stored in localStorage.
+const savedConfig=loadJson(CONFIG_KEY,null);if(savedConfig){$('projectUrl').value=savedConfig.url||'';$('publishableKey').value=savedConfig.key||'';}
 // Create the capture image elements in the camera flow's status UI without saving images persistently.
 const style=document.createElement('style');style.textContent='.captured-mini{display:none;width:88px;height:66px;object-fit:cover;border-radius:8px;border:1px solid #34475d}';document.head.append(style);
 // Tiny preview slot below the engine status.
 const engine=$('engineStatus');const capturePreviewSlot=document.createElement('div');capturePreviewSlot.style.cssText='display:flex;gap:10px;align-items:center;margin-top:8px';const capturedImage=document.createElement('img');capturedImage.id='capturedImage';capturedImage.className='captured-mini';capturedImage.alt='Temporary capture preview';const capturePlaceholder=document.createElement('span');capturePlaceholder.id='capturePlaceholder';capturePlaceholder.className='small';capturePlaceholder.textContent='No capture yet';capturePreviewSlot.append(capturedImage,capturePlaceholder);engine.insertAdjacentElement('afterend',capturePreviewSlot);window.addEventListener('beforeunload',()=>{if(stream)stream.getTracks().forEach(t=>t.stop());});
-renderEmployees();renderAttendance();refreshButtons();
+renderEmployees();renderAttendance();updateAuthUi();refreshButtons();
 })();
 </script>
 </body>
