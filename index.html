@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>FaceCheck | Attendance Demo</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0b1220; --panel:#121d2e; --panel2:#172438; --line:#2a3a50; --text:#eff6ff; --muted:#a4b3c7; --accent:#34d399; --accent2:#22d3ee; --danger:#fb7185; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; background:radial-gradient(circle at 50% -10%,#1c3550 0%,var(--bg) 48%); color:var(--text); min-height:100vh; }
+    .wrap { width:min(100%,980px); margin:0 auto; padding:24px 16px 36px; }
+    header { display:flex; align-items:center; gap:12px; margin:4px 0 22px; }
+    .logo { width:46px; height:46px; display:grid; place-items:center; border-radius:14px; background:linear-gradient(135deg,#34d39922,#22d3ee24); border:1px solid #34d39955; color:var(--accent); flex:0 0 auto; }
+    .logo svg { width:29px; height:29px; }
+    h1 { font-size:clamp(21px,4vw,28px); line-height:1.1; margin:0; letter-spacing:-.04em; }
+    .subtitle { color:var(--muted); font-size:13px; margin-top:5px; }
+    .tag { margin-left:auto; border:1px solid var(--line); color:#cbd5e1; background:#101a29; border-radius:999px; padding:7px 10px; font-size:11px; white-space:nowrap; }
+    .grid { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr); gap:16px; align-items:start; }
+    .panel { border:1px solid var(--line); border-radius:22px; overflow:hidden; background:linear-gradient(180deg,#142033f5,#101a29f5); box-shadow:0 20px 60px #0002; }
+    .panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:17px 18px; border-bottom:1px solid var(--line); }
+    .panel-head h2 { font-size:14px; margin:0; font-weight:700; }
+    .small-label { font-size:11px; color:var(--muted); }
+    .cam-wrap { position:relative; background:#060b12; aspect-ratio:4/3; overflow:hidden; display:grid; place-items:center; }
+    video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); display:block; }
+    .placeholder { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; color:#91a4bb; text-align:center; padding:24px; }
+    .placeholder svg { width:52px; height:52px; opacity:.8; }
+    .placeholder strong { color:#dbeafe; font-size:14px; }
+    .placeholder span { font-size:12px; max-width:260px; line-height:1.5; }
+    .face-oval { pointer-events:none; position:absolute; left:50%; top:47%; transform:translate(-50%,-50%); width:min(59%,260px); height:75%; max-height:330px; border:2px dashed #34d399aa; border-radius:48% 48% 45% 45%; box-shadow:0 0 0 999px #00000016; }
+    .face-oval::after { content:""; position:absolute; inset:-6px; border:1px solid #34d39922; border-radius:inherit; }
+    .live-pill { position:absolute; top:12px; left:12px; background:#09111dcc; border:1px solid #ffffff24; border-radius:999px; display:flex; align-items:center; gap:7px; padding:7px 10px; font-size:11px; color:#e5edf8; backdrop-filter:blur(8px); }
+    .dot { width:7px; height:7px; border-radius:50%; background:#64748b; }
+    .dot.on { background:var(--accent); box-shadow:0 0 12px #34d39988; }
+    .cam-foot { display:flex; gap:8px; align-items:center; padding:12px 16px; color:var(--muted); font-size:12px; border-top:1px solid #1e2d41; }
+    .status-icon { display:grid; place-items:center; flex:0 0 25px; width:25px; height:25px; border-radius:8px; background:#1e3145; color:var(--accent2); }
+    .status-icon svg { width:15px; height:15px; }
+    .status-text { line-height:1.4; }
+    .right { display:flex; flex-direction:column; gap:16px; }
+    .challenge-body { padding:18px; }
+    .eyebrow { text-transform:uppercase; color:var(--accent); font-size:10px; letter-spacing:.15em; font-weight:800; }
+    .challenge-title { font-size:clamp(23px,4vw,31px); letter-spacing:-.04em; font-weight:800; line-height:1.1; margin:8px 0 10px; }
+    .description { font-size:13px; line-height:1.55; color:var(--muted); min-height:40px; margin:0; }
+    .challenge-icon-wrap { display:flex; align-items:center; justify-content:center; height:102px; margin:15px 0 4px; }
+    .challenge-icon { width:88px; height:88px; display:grid; place-items:center; border-radius:25px; border:1px solid #34d39942; background:radial-gradient(circle at 50% 35%,#34d39920,#22d3ee08); color:var(--accent); }
+    .challenge-icon svg { width:43px; height:43px; }
+    .progress { display:flex; gap:6px; margin:12px 0 18px; }
+    .progress span { flex:1; height:5px; border-radius:999px; background:#28384b; }
+    .progress span.active { background:linear-gradient(90deg,var(--accent),var(--accent2)); }
+    .buttons { display:flex; flex-direction:column; gap:9px; }
+    button { width:100%; border:0; border-radius:13px; font:inherit; font-size:13px; font-weight:800; padding:13px 15px; cursor:pointer; transition:transform .15s,opacity .15s; }
+    button:active:not(:disabled) { transform:scale(.99); }
+    button:disabled { cursor:not-allowed; opacity:.45; }
+    .primary { color:#04231b; background:linear-gradient(100deg,#34d399,#67e8f9); box-shadow:0 8px 25px #34d3991c; }
+    .secondary { background:#1c2a3d; border:1px solid #34465d; color:#e5eefb; }
+    .hint { font-size:11px; color:#8293aa; line-height:1.5; text-align:center; margin:4px 2px 0; }
+    .capture-panel { padding:15px 16px; }
+    .capture-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .capture-top strong { font-size:13px; }
+    .capture-empty { border:1px dashed #35475c; border-radius:13px; min-height:105px; display:flex; align-items:center; justify-content:center; text-align:center; padding:18px; color:#8293aa; font-size:12px; line-height:1.5; }
+    .capture-empty img { display:none; max-width:100%; max-height:200px; border-radius:10px; object-fit:contain; }
+    .disclaimer { margin-top:16px; display:flex; gap:10px; align-items:flex-start; padding:13px 14px; border:1px solid #66552a; background:#4a3a171f; border-radius:13px; color:#d9c89f; font-size:11px; line-height:1.55; }
+    .disclaimer svg { width:17px; height:17px; flex:0 0 auto; margin-top:1px; }
+    footer { text-align:center; color:#6f829a; font-size:10px; margin-top:18px; }
+    @media (max-width:720px) { .wrap { padding:16px 12px 26px; } header { margin-bottom:16px; } .tag { display:none; } .grid { grid-template-columns:1fr; } .right { display:grid; grid-template-columns:1fr; } .cam-wrap { aspect-ratio:4/3; max-height:58vh; } .challenge-body { padding:16px; } .challenge-icon-wrap { height:72px; margin:10px 0 0; } .challenge-icon { width:64px; height:64px; border-radius:19px; } .challenge-icon svg { width:32px; height:32px; } .challenge-title { font-size:25px; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M3.5 13.5c0-2.4 1.6-4 4-4h5.2c1.8 0 3.3 1.2 3.3 3v6.1c0 2.1-1.5 3.6-3.7 3.6H8.1c-2.7 0-4.6-2-4.6-4.7v-4ZM28.5 13.5c0-2.4-1.6-4-4-4h-5.2c-1.8 0-3.3 1.2-3.3 3v6.1c0 2.1 1.5 3.6 3.7 3h4.2c2.7 0 4.6-1.4 4.6-4.1v-4Z" stroke="currentColor" stroke-width="1.7"/><path d="M15.9 13.3h.2M1.5 12.5l2.2.7M28.4 13.2l2.1-.7M9 23.2l-1.4 2.1M23 23.2l1.4 2.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <h1>FaceCheck</h1>
+        <div class="subtitle">Random liveness verification · Android-ready demo</div>
+      </div>
+      <div class="tag">MILESTONE 1 / 3</div>
+    </header>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Live camera</h2>
+          <span class="small-label" id="faceCount">Camera not started</span>
+        </div>
+        <div class="cam-wrap">
+          <video id="video" autoplay muted playsinline aria-label="Front camera preview"></video>
+          <div class="placeholder" id="placeholder">
+            <svg viewBox="0 0 48 48" fill="none"><rect x="5" y="11" width="38" height="27" rx="6" stroke="currentColor" stroke-width="1.8"/><circle cx="24" cy="24.5" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m17 11 2-4h10l2 4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <strong>Camera preview will appear here</strong>
+            <span>Allow camera permission when your browser asks.</span>
+          </div>
+          <div class="face-oval" id="faceOval" hidden></div>
+          <div class="live-pill"><span class="dot" id="liveDot"></span><span id="liveText">CAMERA OFF</span></div>
+        </div>
+        <div class="cam-foot">
+          <div class="status-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.6 5.6 7 7m10 10 1.4 1.4m0-12.8L17 7M7 17l-1.4 1.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/></svg></div>
+          <div class="status-text" id="statusText" role="status" aria-live="polite">Enable the front camera to begin. Your live frames are processed in this browser in this demo.</div>
+        </div>
+      </section>
+
+      <div class="right">
+        <section class="panel">
+          <div class="panel-head"><h2>Verification challenge</h2><span class="small-label" id="challengeNumber">WAITING</span></div>
+          <div class="challenge-body">
+            <div class="eyebrow" id="challengeEyebrow">READY TO BEGIN</div>
+            <div class="challenge-title" id="challengeTitle">Let's verify it's you.</div>
+            <p class="description" id="challengeDescription">The app will randomly choose an action. Complete it to trigger an automatic face capture.</p>
+            <div class="challenge-icon-wrap"><div class="challenge-icon" id="challengeIcon"><svg viewBox="0 0 48 48" fill="none"><path d="M5 23c4-7 10-11 19-11s15 4 19 11c-4 7-10 11-19 11S9 30 5 23Z" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="23" r="5" stroke="currentColor" stroke-width="2"/><path d="M17 5 14 9M31 5l3 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div></div>
+            <div class="progress" aria-label="Challenge progress"><span id="p1"></span><span id="p2"></span><span id="p3"></span></div>
+            <div class="buttons">
+              <button class="primary" id="cameraBtn">Enable front camera</button>
+              <button class="primary" id="verifyBtn" disabled>Start random check</button>
+              <button class="secondary" id="retryBtn" hidden>Try another random check</button>
+            </div>
+            <p class="hint" id="buttonHint">Camera permission and an internet connection are required for the first model load.</p>
+          </div>
+        </section>
+
+        <section class="panel capture-panel">
+          <div class="capture-top"><strong>Automatic capture</strong><span class="small-label" id="captureState">No capture yet</span></div>
+          <div class="capture-empty" id="captureBox"><span id="captureEmptyText">Your face image will appear here after the challenge passes.</span><img id="capturedImage" alt="Captured face preview"></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="disclaimer"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 21 19H3L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9v4m0 3h.01" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><div><strong>Prototype only.</strong> This demo checks random actions and captures a preview; it does not identify an employee or save attendance records. A blink/head-turn challenge alone is not proof against every spoofing attack.</div></div>
+    <footer>FaceCheck demo · No employee database or attendance records are connected.</footer>
+  </main>
+
+  <script type="module">
+    import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/vision_bundle.mjs";
+
+    const $ = (id) => document.getElementById(id);
+    const video = $("video");
+    const cameraBtn = $("cameraBtn");
+    const verifyBtn = $("verifyBtn");
+    const retryBtn = $("retryBtn");
+    const placeholder = $("placeholder");
+    const faceOval = $("faceOval");
+    const liveDot = $("liveDot");
+    const liveText = $("liveText");
+    const statusText = $("statusText");
+    const challengeEyebrow = $("challengeEyebrow");
+    const challengeTitle = $("challengeTitle");
+    const challengeDescription = $("challengeDescription");
+    const challengeNumber = $("challengeNumber");
+    const challengeIcon = $("challengeIcon");
+    const faceCount = $("faceCount");
+    const captureState = $("captureState");
+    const captureEmptyText = $("captureEmptyText");
+    const capturedImage = $("capturedImage");
+    const progressBars = [$("p1"), $("p2"), $("p3")];
+
+    let stream = null;
+    let landmarker = null;
+    let rafId = null;
+    let lastVideoTime = -1;
+    let lastInferenceAt = 0;
+    let phase = "ready";
+    let currentChallenge = null;
+    let blinkCount = 0;
+    let eyesClosed = false;
+    let blinkClosedAt = 0;
+    let lastBlinkAt = 0;
+    let neutralYaw = null;
+    let challengeYawBase = null;
+    let turnFrames = 0;
+    let returnFrames = 0;
+    let turnDetected = false;
+    let actionProgress = 0;
+
+    const challenges = [
+      { id: "blink1", label: "BLINK ONCE", title: "Blink once", description: "Close both eyes, then open them again. Keep your face inside the oval.", kind: "blink", required: 1, icon: eyeIcon() },
+      { id: "blink2", label: "BLINK TWICE", title: "Blink twice", description: "Blink two separate times. Open your eyes fully between blinks.", kind: "blink", required: 2, icon: eyeIcon() },
+      { id: "turn", label: "TURN YOUR HEAD", title: "Turn your head", description: "Turn your head to either side, then look straight at the camera again.", kind: "turn", required: 1, icon: headIcon() }
+    ];
+
+    function eyeIcon() {
+      return '<svg viewBox="0 0 48 48" fill="none"><path d="M4 24s7-12 20-12 20 12 20 12-7 12-20 12S4 24 4 24Z" stroke="currentColor" stroke-width="2.3"/><circle cx="24" cy="24" r="6" stroke="currentColor" stroke-width="2.3"/><path d="M12 7 9 10m27-3 3 3" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>';
+    }
+    function headIcon() {
+      return '<svg viewBox="0 0 48 48" fill="none"><path d="M24 8c-9 0-15 7-15 16v5c0 7 5 11 11 11h8c6 0 11-4 11-11v-5C39 15 33 8 24 8Z" stroke="currentColor" stroke-width="2.3"/><path d="M4 18h8m-4-4 4 4-4 4M44 18h-8m4-4-4 4 4 4" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 24h.1M30 24h.1" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>';
+    }
+    function setStatus(message) { statusText.textContent = message; }
+    function setProgress(n) { progressBars.forEach((bar, i) => bar.classList.toggle("active", i < n)); }
+    function setCameraState(on, text) {
+      liveDot.classList.toggle("on", on);
+      liveText.textContent = text;
+    }
+
+    async function setupLandmarker() {
+      setStatus("Loading face landmark model. The first load may take a little time.");
+      const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm");
+      landmarker = await FaceLandmarker.createFromOptions(vision, {
+        baseOptions: { modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task" },
+        runningMode: "VIDEO",
+        numFaces: 2,
+        outputFaceBlendshapes: true,
+        outputFacialTransformationMatrixes: false,
+        minFaceDetectionConfidence: 0.55,
+        minFacePresenceConfidence: 0.55,
+        minTrackingConfidence: 0.55
+      });
+    }
+
+    async function enableCamera() {
+      cameraBtn.disabled = true;
+      cameraBtn.textContent = "Starting camera…";
+      try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error("Camera access is unavailable. Open this page using HTTPS (or localhost) in a supported browser.");
+        }
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: { ideal: "user" }, width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24, max: 30 } }
+        });
+        video.srcObject = stream;
+        await new Promise((resolve) => {
+          if (video.readyState >= 2) resolve();
+          else video.addEventListener("loadedmetadata", resolve, { once: true });
+        });
+        await video.play();
+        placeholder.hidden = true;
+        faceOval.hidden = false;
+        setCameraState(true, "CAMERA ON");
+        await setupLandmarker();
+        cameraBtn.textContent = "Camera ready";
+        verifyBtn.disabled = false;
+        verifyBtn.focus({ preventScroll: true });
+        setStatus("Camera ready. Position one face in the oval, then start the random check.");
+        $("buttonHint").textContent = "Only the liveness demo runs now. Captured images are not uploaded or saved.";
+        renderLoop();
+      } catch (error) {
+        console.error(error);
+        if (stream) stream.getTracks().forEach((track) => track.stop());
+        stream = null;
+        cameraBtn.disabled = false;
+        cameraBtn.textContent = "Try enabling camera again";
+        setCameraState(false, "CAMERA ERROR");
+        setStatus(error?.name === "NotAllowedError"
+          ? "Camera permission was denied. Allow camera access in your browser settings, then try again."
+          : (error?.message || "Could not start the camera. Check browser camera permission and internet connection."));
+      }
+    }
+
+    function getBlinkScore(result) {
+      const categories = result.faceBlendshapes?.[0]?.categories || [];
+      const left = categories.find((item) => item.categoryName === "eyeBlinkLeft")?.score ?? 0;
+      const right = categories.find((item) => item.categoryName === "eyeBlinkRight")?.score ?? 0;
+      return (left + right) / 2;
+    }
+
+    function getYawSignal(landmarks) {
+      if (!landmarks || landmarks.length < 264) return null;
+      const nose = landmarks[1];
+      const eyeA = landmarks[33];
+      const eyeB = landmarks[263];
+      const eyeMidX = (eyeA.x + eyeB.x) / 2;
+      const eyeSpan = Math.max(0.001, Math.abs(eyeB.x - eyeA.x));
+      return (nose.x - eyeMidX) / eyeSpan;
+    }
+
+    function beginRandomCheck() {
+      if (!landmarker || !stream) return;
+      currentChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+      phase = "challenge";
+      blinkCount = 0;
+      eyesClosed = false;
+      blinkClosedAt = 0;
+      lastBlinkAt = 0;
+      challengeYawBase = neutralYaw;
+      turnFrames = 0;
+      returnFrames = 0;
+      turnDetected = false;
+      actionProgress = 0;
+      setProgress(0);
+      challengeNumber.textContent = "RANDOM CHECK";
+      challengeEyebrow.textContent = "COMPLETE THIS ACTION";
+      challengeTitle.textContent = currentChallenge.title;
+      challengeDescription.textContent = currentChallenge.description;
+      challengeIcon.innerHTML = currentChallenge.icon;
+      verifyBtn.hidden = true;
+      verifyBtn.disabled = true;
+      retryBtn.hidden = true;
+      captureState.textContent = "Waiting for action";
+      captureEmptyText.textContent = "Your face image will appear here after the challenge passes.";
+      capturedImage.style.display = "none";
+      capturedImage.removeAttribute("src");
+      setStatus("Follow the instruction. Capture will happen automatically after the action succeeds.");
+    }
+
+    function markActionProgress(n) {
+      actionProgress = n;
+      setProgress(n);
+    }
+
+    function processChallenge(result, now, yaw) {
+      if (currentChallenge.kind === "blink") {
+        const score = getBlinkScore(result);
+        if (!eyesClosed && score >= 0.58 && (now - lastBlinkAt) > 220) {
+          eyesClosed = true;
+          blinkClosedAt = now;
+        } else if (eyesClosed && score <= 0.30) {
+          const closedDuration = now - blinkClosedAt;
+          eyesClosed = false;
+          if (closedDuration >= 55 && closedDuration <= 900 && (now - lastBlinkAt) > 220) {
+            blinkCount += 1;
+            lastBlinkAt = now;
+            markActionProgress(Math.min(blinkCount, currentChallenge.required));
+            challengeDescription.textContent = currentChallenge.required === 2
+              ? `Blink detected: ${blinkCount} of 2. Open your eyes fully between blinks.`
+              : "Blink detected. Verifying…";
+            if (blinkCount >= currentChallenge.required) finishCapture();
+          }
+        }
+      } else if (currentChallenge.kind === "turn") {
+        if (yaw === null || challengeYawBase === null) return;
+        const difference = Math.abs(yaw - challengeYawBase);
+        if (!turnDetected) {
+          turnFrames = difference >= 0.16 ? turnFrames + 1 : Math.max(0, turnFrames - 1);
+          if (turnFrames >= 3) {
+            turnDetected = true;
+            markActionProgress(1);
+            challengeDescription.textContent = "Head turn detected. Now look straight at the camera again.";
+            setStatus("Good. Return your face to the center to finish the challenge.");
+          }
+        } else {
+          returnFrames = difference <= 0.075 ? returnFrames + 1 : 0;
+          if (returnFrames >= 3) finishCapture();
+        }
+      }
+    }
+
+    function finishCapture() {
+      if (phase !== "challenge") return;
+      if (!video.videoWidth || !video.videoHeight) {
+        setStatus("The camera image is not ready yet. Please try again.");
+        return;
+      }
+      phase = "done";
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      capturedImage.src = canvas.toDataURL("image/jpeg", 0.88);
+      capturedImage.style.display = "block";
+      captureEmptyText.style.display = "none";
+      captureState.textContent = "Captured in this browser";
+      challengeNumber.textContent = "PASSED";
+      challengeEyebrow.textContent = "ACTION COMPLETED";
+      challengeTitle.textContent = "Challenge passed!";
+      challengeDescription.textContent = "A face preview was captured. Employee identity matching and attendance logging are not connected in this demo.";
+      challengeIcon.innerHTML = '<svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke="currentColor" stroke-width="2.5"/><path d="m15 24 6 6 13-14" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      setProgress(3);
+      setStatus("Random action passed and face preview captured. No image was uploaded or saved by this demo.");
+      verifyBtn.hidden = true;
+      retryBtn.hidden = false;
+      retryBtn.focus({ preventScroll: true });
+    }
+
+    function renderLoop() {
+      if (!stream || !landmarker) return;
+      rafId = requestAnimationFrame(renderLoop);
+      const now = performance.now();
+      if (video.readyState < 2 || video.currentTime === lastVideoTime || now - lastInferenceAt < 65) return;
+      lastVideoTime = video.currentTime;
+      lastInferenceAt = now;
+      try {
+        const result = landmarker.detectForVideo(video, now);
+        const faces = result.faceLandmarks || [];
+        faceCount.textContent = faces.length === 0 ? "No face detected" : `${faces.length} face${faces.length > 1 ? "s" : ""} detected`;
+        if (faces.length !== 1) {
+          if (phase === "challenge") {
+            setStatus(faces.length === 0 ? "Move into the oval so the camera can see your face." : "Only one person should be in the camera frame.");
+          } else if (phase === "ready") {
+            setStatus(faces.length === 0 ? "Position one face in the oval, then start the random check." : "More than one face is visible. Keep only the employee in the frame.");
+          }
+          return;
+        }
+        const yaw = getYawSignal(faces[0]);
+        if (phase === "ready" && yaw !== null) neutralYaw = neutralYaw === null ? yaw : neutralYaw * 0.92 + yaw * 0.08;
+        if (phase === "challenge") processChallenge(result, now, yaw);
+      } catch (error) {
+        console.warn("Face landmark frame skipped:", error);
+      }
+    }
+
+    cameraBtn.addEventListener("click", enableCamera);
+    verifyBtn.addEventListener("click", beginRandomCheck);
+    retryBtn.addEventListener("click", () => {
+      phase = "ready";
+      currentChallenge = null;
+      retryBtn.hidden = true;
+      verifyBtn.hidden = false;
+      verifyBtn.disabled = false;
+      challengeNumber.textContent = "WAITING";
+      challengeEyebrow.textContent = "READY TO BEGIN";
+      challengeTitle.textContent = "Let's verify it's you.";
+      challengeDescription.textContent = "The next attempt will randomly choose an action. Complete it to trigger an automatic face capture.";
+      challengeIcon.innerHTML = eyeIcon();
+      setProgress(0);
+      captureState.textContent = "No capture yet";
+      captureEmptyText.style.display = "block";
+      captureEmptyText.textContent = "Your face image will appear here after the challenge passes.";
+      capturedImage.style.display = "none";
+      capturedImage.removeAttribute("src");
+      setStatus("Ready for another random check. The camera is still on.");
+    });
+
+    window.addEventListener("pagehide", () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      if (stream) stream.getTracks().forEach((track) => track.stop());
+      if (landmarker) landmarker.close();
+    });
+  </script>
+</body>
+</html>
