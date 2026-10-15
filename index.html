@@ -12,18 +12,13 @@
 </head>
 <body>
 <main class="wrap">
-<header><div class="logo" aria-hidden="true">◎</div><div><h1>FaceCheck</h1><div class="sub">Facial enrollment · Identity matching · Time In / Time Out</div></div><div class="tag">SUPABASE CLOUD BUILD 0.4</div></header>
-<p class="intro">Cloud-connected prototype: employee face templates and attendance events are stored in your own Supabase project. Connect with a publishable key and sign in with your Supabase Auth owner account before enrolling an employee.</p>
+<header><div class="logo" aria-hidden="true">◎</div><div><h1>FaceCheck</h1><div class="sub">Facial enrollment · Identity matching · Time In / Time Out</div></div><div class="tag">SUPABASE CLOUD BUILD 0.5</div></header>
+<p class="intro">Cloud-connected prototype: this app is preconfigured for your FaceCheck Supabase project. The public Project URL and publishable key are built in, so employees do not need to enter database settings. Sign in with your Supabase Auth owner account before enrolling an employee.</p>
 <section class="panel" id="cloudPanel" style="margin-bottom:15px">
-  <div class="head"><h2>Supabase database connection</h2><span class="small" id="cloudBadge">Not connected</span></div>
+  <div class="head"><h2>Supabase database connection</h2><span class="small" id="cloudBadge">Starting connection…</span></div>
   <div class="body">
-    <div class="fields" style="grid-template-columns:1fr;">
-      <div class="field"><label for="projectUrl">Supabase Project URL</label><input id="projectUrl" placeholder="https://your-project-ref.supabase.co" autocomplete="url" spellcheck="false"></div>
-      <div class="field"><label for="publishableKey">Publishable key (sb_publishable_…)</label><input id="publishableKey" placeholder="sb_publishable_…" autocomplete="off" spellcheck="false"></div>
-    </div>
-    <button class="primary" id="connectBtn">Connect Supabase project</button>
-    <div class="statusline" id="cloudStatus">Step 1: Run the included SQL schema in Supabase SQL Editor, then paste your project URL and publishable key here. Use only an sb_publishable_ key — never a secret key.</div>
-    <p class="subnote">The publishable key is intended for browser apps and is protected by the database policies. Never paste an <code>sb_secret_</code> or service_role key here.</p>
+    <div class="statusline" id="cloudStatus">Connecting to the preconfigured FaceCheck Supabase project…</div>
+    <p class="subnote">Project URL and public publishable key are built into this app. No database key entry is needed here. Only a publishable key is used in the browser; never place a Supabase secret/service-role key in this website.</p>
     <div id="authPanel" hidden style="margin-top:16px;border-top:1px solid var(--line);padding-top:15px">
       <div class="eyebrow" id="authHeading">OWNER ACCOUNT</div>
       <p class="subnote" style="margin:6px 0 12px">Create or sign in to your Supabase Auth owner account. The database uses Row Level Security to limit rows to this signed-in account.</p>
@@ -33,7 +28,7 @@
       </div>
       <div class="log-tools"><button class="primary" id="createAccountBtn">Create owner account</button><button class="secondary" id="signInBtn">Sign in</button></div>
       <button class="danger" id="signOutBtn" hidden>Sign out</button>
-      <div class="statusline" id="authStatus">Connect to Supabase, then create your owner account or sign in.</div>
+      <div class="statusline" id="authStatus">Connecting to your owner account…</div>
     </div>
   </div>
 </section>
@@ -57,7 +52,9 @@
 'use strict';
 const $ = (id) => document.getElementById(id);
 const video = $('video');
-const CONFIG_KEY = 'https://ppqmytbkqxluexrovccw.supabase.co';
+// Browser-safe project configuration. These are deliberately public credentials, not secrets.
+const SUPABASE_URL = 'https://ppqmytbkqxluexrovccw.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_bnrXdg0t7mriqgxAFDG1Dg_0ifip08N';
 const TABLE_EMPLOYEES = 'facecheck_employees';
 const TABLE_TEMPLATES = 'facecheck_face_templates';
 const TABLE_ATTENDANCE = 'facecheck_attendance';
@@ -66,7 +63,7 @@ const FACE_MATCH_THRESHOLD = 0.54; // Prototype threshold; calibrate using real 
 const detOpts = () => new window.faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 });
 let stream = null, modelsReady = false, modelsPromise = null, flowRunning = false, cameraBusy = false, retryMode = null;
 let employees = [], attendance = [], lastCaptureUrl = null;
-let supabaseClient = null, currentSession = null, cloudReady = false, authSubscription = null;
+let supabaseClient = null, currentSession = null, cloudReady = false;
 const challenges = [
   { id:'blink1', title:'Blink once', description:'Close both eyes, then open them again. Keep your face inside the oval.', type:'blink', required:1 },
   { id:'blink2', title:'Blink twice', description:'Blink twice, opening your eyes fully between blinks.', type:'blink', required:2 },
@@ -284,22 +281,20 @@ function updateAuthUi(){
   else {$('authStatus').textContent='Connect your Supabase project first.';$('authStatus').className='statusline';}
 }
 async function connectSupabase(){
-  const url=$('projectUrl').value.trim().replace(/\/$/,'');const key=$('publishableKey').value.trim();
-  if(!url||!key){$('cloudStatus').textContent='Enter both the Supabase Project URL and the publishable key.';return;}
+  const url=SUPABASE_URL;const key=SUPABASE_PUBLISHABLE_KEY;
+  if(!url||!key){$('cloudStatus').textContent='The built-in Supabase project configuration is missing. Check the app source before deploying.';$('cloudStatus').className='statusline warn';return;}
   try{const parsed=new URL(url);if(parsed.protocol!=='https:')throw new Error('Use the HTTPS Supabase Project URL.');if(!key.startsWith('sb_publishable_'))throw new Error('Use only the Supabase publishable key beginning sb_publishable_. Do not use a secret key, service_role key, or a key beginning sb_secret_.');}
   catch(e){$('cloudStatus').textContent=`Connection settings error: ${e.message}`;$('cloudStatus').className='statusline warn';return;}
-  if(!window.supabase||typeof window.supabase.createClient!=='function'){$('cloudStatus').textContent='The Supabase JS library did not load. Check internet access, reload, and retry.';$('cloudStatus').className='statusline warn';return;}
-  $('connectBtn').disabled=true;$('cloudStatus').textContent='Connecting to Supabase…';$('cloudStatus').className='statusline';
+  if(!window.supabase||typeof window.supabase.createClient!=='function'){$('cloudBadge').textContent='Library error';$('cloudStatus').textContent='The Supabase JS library did not load. Check internet access and reload the page.';$('cloudStatus').className='statusline warn';return;}
+  $('cloudStatus').textContent='Connecting to your configured Supabase project…';$('cloudStatus').className='statusline';
   try{
-    if(authSubscription){authSubscription.unsubscribe();authSubscription=null;}
     supabaseClient=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-    saveJson(CONFIG_KEY,{url,key});
     const {data,error}=await supabaseClient.auth.getSession();if(error)throw error;
     currentSession=data.session||null;updateAuthUi();
-    $('cloudBadge').textContent='Project configured';$('cloudStatus').textContent='Supabase client configured. Now create your owner account or sign in. If you already ran the SQL schema and a session exists, records will load automatically.';$('cloudStatus').className='statusline good';
+    $('cloudBadge').textContent='Project configured';$('cloudStatus').textContent='Supabase client initialized. Create your owner account or sign in below. After signing in, FaceCheck will read the tables created by your SQL script.';$('cloudStatus').className='statusline good';
     if(currentSession)await loadCloudData();
   }catch(e){console.error(e);$('cloudBadge').textContent='Connection failed';$('cloudStatus').textContent=`Could not initialize Supabase: ${e.message||e}`;$('cloudStatus').className='statusline warn';}
-  finally{$('connectBtn').disabled=false;refreshButtons();}
+  finally{refreshButtons();}
 }
 async function createOwnerAccount(){
   if(!supabaseClient){$('authStatus').textContent='Connect your Supabase project first.';return;}
@@ -326,14 +321,14 @@ async function signOutOwner(){
   const {error}=await supabaseClient.auth.signOut();if(error){$('authStatus').textContent=`Sign out failed: ${error.message}`;return;}
   currentSession=null;cloudReady=false;employees=[];attendance=[];renderEmployees();renderAttendance();updateAuthUi();refreshButtons();$('cloudBadge').textContent='Signed out';$('cloudStatus').textContent='Signed out. Cloud records remain in Supabase and were not deleted.';
 }
-$('cameraBtn').addEventListener('click',startCameraAndModels);$('stopBtn').addEventListener('click',stopCamera);$('enrollBtn').addEventListener('click',enroll);$('verifyBtn').addEventListener('click',verifyAndClock);$('retryBtn').addEventListener('click',()=>{const mode=retryMode;$('retryBtn').hidden=true;if(mode==='enroll')enroll();else verifyAndClock();});$('exportBtn').addEventListener('click',exportCsv);$('refreshBtn').addEventListener('click',loadCloudData);$('connectBtn').addEventListener('click',connectSupabase);$('createAccountBtn').addEventListener('click',createOwnerAccount);$('signInBtn').addEventListener('click',signInOwner);$('signOutBtn').addEventListener('click',signOutOwner);
-// Restore only the public project URL and publishable key; biometric templates and logs are never stored in localStorage.
-const savedConfig=loadJson(CONFIG_KEY,null);if(savedConfig){$('projectUrl').value=savedConfig.url||'';$('publishableKey').value=savedConfig.key||'';}
+$('cameraBtn').addEventListener('click',startCameraAndModels);$('stopBtn').addEventListener('click',stopCamera);$('enrollBtn').addEventListener('click',enroll);$('verifyBtn').addEventListener('click',verifyAndClock);$('retryBtn').addEventListener('click',()=>{const mode=retryMode;$('retryBtn').hidden=true;if(mode==='enroll')enroll();else verifyAndClock();});$('exportBtn').addEventListener('click',exportCsv);$('refreshBtn').addEventListener('click',loadCloudData);$('createAccountBtn').addEventListener('click',createOwnerAccount);$('signInBtn').addEventListener('click',signInOwner);$('signOutBtn').addEventListener('click',signOutOwner);
+// Project URL and publishable key are configured in source. No key-entry UI or secret key is used.
 // Create the capture image elements in the camera flow's status UI without saving images persistently.
 const style=document.createElement('style');style.textContent='.captured-mini{display:none;width:88px;height:66px;object-fit:cover;border-radius:8px;border:1px solid #34475d}';document.head.append(style);
 // Tiny preview slot below the engine status.
 const engine=$('engineStatus');const capturePreviewSlot=document.createElement('div');capturePreviewSlot.style.cssText='display:flex;gap:10px;align-items:center;margin-top:8px';const capturedImage=document.createElement('img');capturedImage.id='capturedImage';capturedImage.className='captured-mini';capturedImage.alt='Temporary capture preview';const capturePlaceholder=document.createElement('span');capturePlaceholder.id='capturePlaceholder';capturePlaceholder.className='small';capturePlaceholder.textContent='No capture yet';capturePreviewSlot.append(capturedImage,capturePlaceholder);engine.insertAdjacentElement('afterend',capturePreviewSlot);window.addEventListener('beforeunload',()=>{if(stream)stream.getTracks().forEach(t=>t.stop());});
 renderEmployees();renderAttendance();updateAuthUi();refreshButtons();
+connectSupabase();
 })();
 </script>
 </body>
