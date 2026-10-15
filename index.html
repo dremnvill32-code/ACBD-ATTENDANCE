@@ -130,8 +130,8 @@
   </main>
 
   <script type="module">
-    import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/vision_bundle.mjs";
-
+    // Load the face model only after the camera preview is running.
+    // That way, a CDN/model problem won't stop the camera button from working.
     const $ = (id) => document.getElementById(id);
     const video = $("video");
     const cameraBtn = $("cameraBtn");
@@ -191,7 +191,10 @@
     }
 
     async function setupLandmarker() {
-      setStatus("Loading face landmark model. The first load may take a little time.");
+      setStatus("Camera is on. Loading the face landmark model; the first load may take a little time.");
+      const { FaceLandmarker, FilesetResolver } = await import(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/vision_bundle.mjs"
+      );
       const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm");
       landmarker = await FaceLandmarker.createFromOptions(vision, {
         baseOptions: { modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task" },
@@ -207,41 +210,70 @@
 
     async function enableCamera() {
       cameraBtn.disabled = true;
-      cameraBtn.textContent = "Starting camera…";
+      cameraBtn.textContent = stream ? "Loading face model…" : "Starting camera…";
+
+      // Stage 1: start the camera independently of the remote face model.
       try {
-        if (!navigator.mediaDevices?.getUserMedia) {
-          throw new Error("Camera access is unavailable. Open this page using HTTPS (or localhost) in a supported browser.");
+        if (!stream) {
+          if (!navigator.mediaDevices?.getUserMedia) {
+            throw new Error("Camera access is unavailable. Open this page through HTTPS in Chrome, then try again.");
+          }
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: { facingMode: { ideal: "user" }, width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24, max: 30 } }
+          });
+          video.srcObject = stream;
+          await new Promise((resolve, reject) => {
+            if (video.readyState >= 2) { resolve(); return; }
+            const timeoutId = setTimeout(() => reject(new Error("The camera was allowed, but its video preview did not start. Close other camera apps and try again.")), 10000);
+            video.addEventListener("loadeddata", () => { clearTimeout(timeoutId); resolve(); }, { once: true });
+            video.addEventListener("error", () => { clearTimeout(timeoutId); reject(new Error("The camera feed could not be displayed. Reload the page and try again.")); }, { once: true });
+          });
+          await video.play();
+          placeholder.hidden = true;
+          faceOval.hidden = false;
+          setCameraState(true, "CAMERA ON");
+          setStatus("Camera is on. Loading facial verification…");
         }
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: { facingMode: { ideal: "user" }, width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24, max: 30 } }
-        });
-        video.srcObject = stream;
-        await new Promise((resolve) => {
-          if (video.readyState >= 2) resolve();
-          else video.addEventListener("loadedmetadata", resolve, { once: true });
-        });
-        await video.play();
-        placeholder.hidden = true;
-        faceOval.hidden = false;
-        setCameraState(true, "CAMERA ON");
-        await setupLandmarker();
-        cameraBtn.textContent = "Camera ready";
-        verifyBtn.disabled = false;
-        verifyBtn.focus({ preventScroll: true });
-        setStatus("Camera ready. Position one face in the oval, then start the random check.");
-        $("buttonHint").textContent = "Only the liveness demo runs now. Captured images are not uploaded or saved.";
-        renderLoop();
       } catch (error) {
-        console.error(error);
+        console.error("Camera start failed:", error);
         if (stream) stream.getTracks().forEach((track) => track.stop());
         stream = null;
+        video.srcObject = null;
         cameraBtn.disabled = false;
         cameraBtn.textContent = "Try enabling camera again";
         setCameraState(false, "CAMERA ERROR");
-        setStatus(error?.name === "NotAllowedError"
-          ? "Camera permission was denied. Allow camera access in your browser settings, then try again."
-          : (error?.message || "Could not start the camera. Check browser camera permission and internet connection."));
+        if (error?.name === "NotAllowedError" || error?.name === "SecurityError") {
+          setStatus("Camera permission was blocked. In Chrome, allow Camera for this website, then reload the page. The site must use HTTPS.");
+        } else if (error?.name === "NotFoundError" || error?.name === "OverconstrainedError") {
+          setStatus("No usable front camera was found. Check that your device has a working camera, then try again.");
+        } else if (error?.name === "NotReadableError" || error?.name === "AbortError") {
+          setStatus("The camera may be in use by another app. Close other camera/video-call apps, then try again.");
+        } else {
+          setStatus(error?.message || "Could not start the camera. Check HTTPS and the browser's camera permission.");
+        }
+        return;
+      }
+
+      // Stage 2: load the facial model. If it fails, keep the live camera running
+      // and let the user retry the model download without re-requesting camera access.
+      try {
+        if (!landmarker) await setupLandmarker();
+        cameraBtn.textContent = "Camera ready";
+        cameraBtn.disabled = true;
+        verifyBtn.disabled = false;
+        verifyBtn.focus({ preventScroll: true });
+        setStatus("Camera and face model ready. Position one face in the oval, then start the random check.");
+        $("buttonHint").textContent = "Only the liveness demo runs now. Captured images are not uploaded or saved.";
+        if (rafId) cancelAnimationFrame(rafId);
+        renderLoop();
+      } catch (error) {
+        console.error("Face model load failed:", error);
+        cameraBtn.disabled = false;
+        cameraBtn.textContent = "Retry face model";
+        verifyBtn.disabled = true;
+        setCameraState(true, "CAMERA ON");
+        setStatus("The camera is on, but the facial model could not load. Check your internet connection or try again. Details: " + (error?.message || "model download failed"));
       }
     }
 
