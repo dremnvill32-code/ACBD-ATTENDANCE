@@ -12,7 +12,7 @@
 </head>
 <body>
 <main class="wrap">
-<header><div class="logo" aria-hidden="true">◎</div><div><h1>FaceCheck</h1><div class="sub">Facial enrollment · Identity matching · Time In / Time Out</div></div><div class="tag">SUPABASE + APPS SCRIPT BUILD 0.6</div></header>
+<header><div class="logo" aria-hidden="true">◎</div><div><h1>FaceCheck</h1><div class="sub">Facial enrollment · Identity matching · Time In / Time Out</div></div><div class="tag">SUPABASE + APPS SCRIPT BUILD 0.7</div></header>
 <p class="intro">Cloud-connected prototype: the Project URL and publishable key are built in. Google Apps Script sends the Supabase confirmation email, while Supabase Auth still manages the signed-in session and database security.</p>
 <section class="panel" id="cloudPanel" style="margin-bottom:15px">
   <div class="head"><h2>Supabase database connection</h2><span class="small" id="cloudBadge">Starting connection…</span></div>
@@ -299,10 +299,21 @@ async function connectSupabase(){
   }catch(e){console.error(e);$('cloudBadge').textContent='Connection failed';$('cloudStatus').textContent=`Could not initialize Supabase: ${e.message||e}`;$('cloudStatus').className='statusline warn';}
   finally{refreshButtons();}
 }
+function showFieldError(id, message){
+  const field=$(id); if(!field) return;
+  field.style.borderColor='#fb7185'; field.style.boxShadow='0 0 0 2px #fb718533';
+  $('authStatus').textContent=message; $('authStatus').className='statusline warn';
+  field.focus();
+}
+function clearFieldError(id){const field=$(id);if(field){field.style.borderColor='';field.style.boxShadow='';}}
 function createOwnerAccount(){
-  if(!supabaseClient){$('authStatus').textContent='Connect to Supabase first; then request the confirmation email.';$('authStatus').className='statusline warn';return;}
-  const email=$('ownerEmail').value.trim().toLowerCase(),password=$('ownerPassword').value,setupCode=$('ownerSetupCode').value;
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||password.length<8||!setupCode){$('authStatus').textContent='Enter a valid email, a password of at least 8 characters, and the one-time owner setup code configured in Apps Script.';$('authStatus').className='statusline warn';return;}
+  if(!supabaseClient){$('authStatus').textContent='Supabase has not finished connecting. Check the cloud connection status above, then try again.';$('authStatus').className='statusline warn';return;}
+  const email=$('ownerEmail').value.trim().toLowerCase(),password=$('ownerPassword').value,setupCode=$('ownerSetupCode').value.trim();
+  ['ownerEmail','ownerPassword','ownerSetupCode'].forEach(clearFieldError);
+  if(!email){showFieldError('ownerEmail','Enter the owner email address in the Owner email box.');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showFieldError('ownerEmail','That email format looks invalid. Example format: name@example.com.');return;}
+  if(password.length<8){showFieldError('ownerPassword','Enter a password with at least 8 characters in the Password box.');return;}
+  if(!setupCode){showFieldError('ownerSetupCode','Enter the exact OWNER_SETUP_CODE from Apps Script Script Properties in the One-time owner setup code box.');return;}
   if(!APPS_SCRIPT_SIGNUP_URL||!APPS_SCRIPT_SIGNUP_URL.startsWith('https://script.google.com/macros/s/')||!APPS_SCRIPT_SIGNUP_URL.endsWith('/exec')){
     $('authStatus').textContent='Apps Script is not connected yet. Deploy the Apps Script as a Web App, then paste its URL ending in /exec into APPS_SCRIPT_SIGNUP_URL in index.html.';$('authStatus').className='statusline warn';return;
   }
@@ -334,7 +345,7 @@ async function signOutOwner(){
   const {error}=await supabaseClient.auth.signOut();if(error){$('authStatus').textContent=`Sign out failed: ${error.message}`;return;}
   currentSession=null;cloudReady=false;employees=[];attendance=[];renderEmployees();renderAttendance();updateAuthUi();refreshButtons();$('cloudBadge').textContent='Signed out';$('cloudStatus').textContent='Signed out. Cloud records remain in Supabase and were not deleted.';
 }
-$('cameraBtn').addEventListener('click',startCameraAndModels);$('stopBtn').addEventListener('click',stopCamera);$('enrollBtn').addEventListener('click',enroll);$('verifyBtn').addEventListener('click',verifyAndClock);$('retryBtn').addEventListener('click',()=>{const mode=retryMode;$('retryBtn').hidden=true;if(mode==='enroll')enroll();else verifyAndClock();});$('exportBtn').addEventListener('click',exportCsv);$('refreshBtn').addEventListener('click',loadCloudData);$('createAccountBtn').addEventListener('click',createOwnerAccount);$('signInBtn').addEventListener('click',signInOwner);$('signOutBtn').addEventListener('click',signOutOwner);
+$('cameraBtn').addEventListener('click',startCameraAndModels);$('stopBtn').addEventListener('click',stopCamera);$('enrollBtn').addEventListener('click',enroll);$('verifyBtn').addEventListener('click',verifyAndClock);$('retryBtn').addEventListener('click',()=>{const mode=retryMode;$('retryBtn').hidden=true;if(mode==='enroll')enroll();else verifyAndClock();});$('exportBtn').addEventListener('click',exportCsv);$('refreshBtn').addEventListener('click',loadCloudData);$('createAccountBtn').addEventListener('click',createOwnerAccount);$('signInBtn').addEventListener('click',signInOwner);$('signOutBtn').addEventListener('click',signOutOwner);['ownerEmail','ownerPassword','ownerSetupCode'].forEach(id=>$(id).addEventListener('input',()=>clearFieldError(id)));
 // Project URL and publishable key are configured in source. No key-entry UI or secret key is used.
 // Create the capture image elements in the camera flow's status UI without saving images persistently.
 const style=document.createElement('style');style.textContent='.captured-mini{display:none;width:88px;height:66px;object-fit:cover;border-radius:8px;border:1px solid #34475d}';document.head.append(style);
