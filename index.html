@@ -1,454 +1,217 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b1220">
-  <title>FaceCheck | Attendance Demo</title>
-  <style>
-    :root { color-scheme: dark; --bg:#0b1220; --panel:#121d2e; --panel2:#172438; --line:#2a3a50; --text:#eff6ff; --muted:#a4b3c7; --accent:#34d399; --accent2:#22d3ee; --danger:#fb7185; }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; background:radial-gradient(circle at 50% -10%,#1c3550 0%,var(--bg) 48%); color:var(--text); min-height:100vh; }
-    .wrap { width:min(100%,980px); margin:0 auto; padding:24px 16px 36px; }
-    header { display:flex; align-items:center; gap:12px; margin:4px 0 22px; }
-    .logo { width:46px; height:46px; display:grid; place-items:center; border-radius:14px; background:linear-gradient(135deg,#34d39922,#22d3ee24); border:1px solid #34d39955; color:var(--accent); flex:0 0 auto; }
-    .logo svg { width:29px; height:29px; }
-    h1 { font-size:clamp(21px,4vw,28px); line-height:1.1; margin:0; letter-spacing:-.04em; }
-    .subtitle { color:var(--muted); font-size:13px; margin-top:5px; }
-    .tag { margin-left:auto; border:1px solid var(--line); color:#cbd5e1; background:#101a29; border-radius:999px; padding:7px 10px; font-size:11px; white-space:nowrap; }
-    .grid { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr); gap:16px; align-items:start; }
-    .panel { border:1px solid var(--line); border-radius:22px; overflow:hidden; background:linear-gradient(180deg,#142033f5,#101a29f5); box-shadow:0 20px 60px #0002; }
-    .panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:17px 18px; border-bottom:1px solid var(--line); }
-    .panel-head h2 { font-size:14px; margin:0; font-weight:700; }
-    .small-label { font-size:11px; color:var(--muted); }
-    .cam-wrap { position:relative; background:#060b12; aspect-ratio:4/3; overflow:hidden; display:grid; place-items:center; }
-    video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); display:block; }
-    .placeholder { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; color:#91a4bb; text-align:center; padding:24px; }
-    .placeholder svg { width:52px; height:52px; opacity:.8; }
-    .placeholder strong { color:#dbeafe; font-size:14px; }
-    .placeholder span { font-size:12px; max-width:260px; line-height:1.5; }
-    .face-oval { pointer-events:none; position:absolute; left:50%; top:47%; transform:translate(-50%,-50%); width:min(59%,260px); height:75%; max-height:330px; border:2px dashed #34d399aa; border-radius:48% 48% 45% 45%; box-shadow:0 0 0 999px #00000016; }
-    .face-oval::after { content:""; position:absolute; inset:-6px; border:1px solid #34d39922; border-radius:inherit; }
-    .live-pill { position:absolute; top:12px; left:12px; background:#09111dcc; border:1px solid #ffffff24; border-radius:999px; display:flex; align-items:center; gap:7px; padding:7px 10px; font-size:11px; color:#e5edf8; backdrop-filter:blur(8px); }
-    .dot { width:7px; height:7px; border-radius:50%; background:#64748b; }
-    .dot.on { background:var(--accent); box-shadow:0 0 12px #34d39988; }
-    .cam-foot { display:flex; gap:8px; align-items:center; padding:12px 16px; color:var(--muted); font-size:12px; border-top:1px solid #1e2d41; }
-    .status-icon { display:grid; place-items:center; flex:0 0 25px; width:25px; height:25px; border-radius:8px; background:#1e3145; color:var(--accent2); }
-    .status-icon svg { width:15px; height:15px; }
-    .status-text { line-height:1.4; }
-    .right { display:flex; flex-direction:column; gap:16px; }
-    .challenge-body { padding:18px; }
-    .eyebrow { text-transform:uppercase; color:var(--accent); font-size:10px; letter-spacing:.15em; font-weight:800; }
-    .challenge-title { font-size:clamp(23px,4vw,31px); letter-spacing:-.04em; font-weight:800; line-height:1.1; margin:8px 0 10px; }
-    .description { font-size:13px; line-height:1.55; color:var(--muted); min-height:40px; margin:0; }
-    .challenge-icon-wrap { display:flex; align-items:center; justify-content:center; height:102px; margin:15px 0 4px; }
-    .challenge-icon { width:88px; height:88px; display:grid; place-items:center; border-radius:25px; border:1px solid #34d39942; background:radial-gradient(circle at 50% 35%,#34d39920,#22d3ee08); color:var(--accent); }
-    .challenge-icon svg { width:43px; height:43px; }
-    .progress { display:flex; gap:6px; margin:12px 0 18px; }
-    .progress span { flex:1; height:5px; border-radius:999px; background:#28384b; }
-    .progress span.active { background:linear-gradient(90deg,var(--accent),var(--accent2)); }
-    .buttons { display:flex; flex-direction:column; gap:9px; }
-    button { width:100%; border:0; border-radius:13px; font:inherit; font-size:13px; font-weight:800; padding:13px 15px; cursor:pointer; transition:transform .15s,opacity .15s; }
-    button:active:not(:disabled) { transform:scale(.99); }
-    button:disabled { cursor:not-allowed; opacity:.45; }
-    .primary { color:#04231b; background:linear-gradient(100deg,#34d399,#67e8f9); box-shadow:0 8px 25px #34d3991c; }
-    .secondary { background:#1c2a3d; border:1px solid #34465d; color:#e5eefb; }
-    .hint { font-size:11px; color:#8293aa; line-height:1.5; text-align:center; margin:4px 2px 0; }
-    .capture-panel { padding:15px 16px; }
-    .capture-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-    .capture-top strong { font-size:13px; }
-    .capture-empty { border:1px dashed #35475c; border-radius:13px; min-height:105px; display:flex; align-items:center; justify-content:center; text-align:center; padding:18px; color:#8293aa; font-size:12px; line-height:1.5; }
-    .capture-empty img { display:none; max-width:100%; max-height:200px; border-radius:10px; object-fit:contain; }
-    .disclaimer { margin-top:16px; display:flex; gap:10px; align-items:flex-start; padding:13px 14px; border:1px solid #66552a; background:#4a3a171f; border-radius:13px; color:#d9c89f; font-size:11px; line-height:1.55; }
-    .disclaimer svg { width:17px; height:17px; flex:0 0 auto; margin-top:1px; }
-    footer { text-align:center; color:#6f829a; font-size:10px; margin-top:18px; }
-    @media (max-width:720px) { .wrap { padding:16px 12px 26px; } header { margin-bottom:16px; } .tag { display:none; } .grid { grid-template-columns:1fr; } .right { display:grid; grid-template-columns:1fr; } .cam-wrap { aspect-ratio:4/3; max-height:58vh; } .challenge-body { padding:16px; } .challenge-icon-wrap { height:72px; margin:10px 0 0; } .challenge-icon { width:64px; height:64px; border-radius:19px; } .challenge-icon svg { width:32px; height:32px; } .challenge-title { font-size:25px; } }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101927">
+<title>FaceCheck | Attendance Prototype</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121e2f;--panel2:#17263a;--line:#2c3e55;--text:#edf5ff;--muted:#a5b4c8;--green:#4ade80;--cyan:#67e8f9;--red:#fb7185;--amber:#fbbf24}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -15%,#1a3550 0,var(--bg) 48%);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}.wrap{max-width:1120px;margin:auto;padding:20px 14px 40px}header{display:flex;align-items:center;gap:12px;margin:3px 0 18px}.logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#34d39917;border:1px solid #34d39955;color:var(--green);font-size:25px}h1{font-size:clamp(22px,4vw,29px);letter-spacing:-.04em;line-height:1.05;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:5px}.tag{margin-left:auto;border:1px solid var(--line);border-radius:999px;padding:7px 10px;color:var(--cyan);font-size:11px;white-space:nowrap}.intro{font-size:13px;color:#ccdae9;line-height:1.55;margin:0 0 17px}.layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.95fr);gap:15px;align-items:start}.stack{display:flex;flex-direction:column;gap:15px}.panel{background:linear-gradient(180deg,#142236f5,#101a29f5);border:1px solid var(--line);border-radius:19px;overflow:hidden;box-shadow:0 15px 45px #0002}.head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:15px 16px;border-bottom:1px solid var(--line)}.head h2{font-size:14px;margin:0}.small{font-size:11px;color:var(--muted)}.cam{position:relative;background:#050a10;aspect-ratio:4/3;display:grid;place-items:center;overflow:hidden}video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}.placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;padding:22px;color:#91a4bb}.placeholder .camicon{font-size:42px}.placeholder strong{color:#e1ebf8;font-size:14px}.placeholder span{max-width:285px;line-height:1.5;font-size:12px}.oval{pointer-events:none;position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:min(59%,260px);height:76%;border:2px dashed #4ade80bb;border-radius:48% 48% 45% 45%;box-shadow:0 0 0 999px #00000014}.live{position:absolute;top:11px;left:11px;display:flex;gap:7px;align-items:center;background:#07111ddd;border:1px solid #ffffff22;border-radius:999px;padding:7px 10px;font-size:10px}.dot{width:7px;height:7px;border-radius:50%;background:#64748b}.dot.on{background:var(--green);box-shadow:0 0 12px #4ade8088}.status{display:flex;gap:10px;padding:12px 15px;border-top:1px solid #24344a;color:#d3e2f2;font-size:12px;line-height:1.5;min-height:52px}.statusicon{width:24px;height:24px;flex:0 0 24px;border-radius:8px;background:#1c3447;display:grid;place-items:center;color:var(--cyan)}.body{padding:16px}.eyebrow{text-transform:uppercase;font-size:10px;font-weight:800;letter-spacing:.14em;color:var(--green)}.challengeTitle{font-size:clamp(22px,4vw,30px);font-weight:850;letter-spacing:-.045em;line-height:1.1;margin:8px 0}.desc{font-size:12px;color:var(--muted);line-height:1.55;margin:0 0 13px;min-height:35px}.actionbanner{border:1px solid #315341;background:#12372b55;border-radius:13px;padding:12px 13px;margin:12px 0;font-size:13px;line-height:1.4;color:#d1fae5}.progress{display:flex;gap:6px;margin:11px 0 15px}.progress span{height:5px;flex:1;background:#2b3b4e;border-radius:8px}.progress span.ok{background:linear-gradient(90deg,var(--green),var(--cyan))}button{width:100%;padding:12px 14px;border-radius:12px;border:0;font:inherit;font-weight:800;font-size:12px;cursor:pointer;margin-top:8px;transition:opacity .15s,transform .15s}button:active:not(:disabled){transform:scale(.99)}button:disabled{opacity:.42;cursor:not-allowed}.primary{background:linear-gradient(100deg,var(--green),var(--cyan));color:#06241b}.secondary{background:#1c2c40;border:1px solid #3b4d63;color:#e5eefb}.danger{background:#3c1f2a;border:1px solid #704052;color:#ffdbe2}.fields{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-bottom:8px}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}.field input{width:100%;min-width:0;padding:11px 12px;border:1px solid #354960;border-radius:10px;background:#0d1726;color:var(--text);font:inherit;font-size:13px}.checkrow{display:flex;gap:9px;align-items:flex-start;font-size:11px;line-height:1.45;color:#c5d2e2;margin:12px 0 5px}.checkrow input{margin-top:2px;accent-color:var(--green)}.subnote{font-size:11px;color:#94a7bc;line-height:1.55;margin-top:10px}.statusline{border:1px solid var(--line);border-radius:11px;padding:10px 12px;color:var(--muted);font-size:11px;line-height:1.5;margin-top:10px}.statusline.good{border-color:#246448;color:#bbf7d0;background:#103a2b42}.statusline.warn{border-color:#6b5322;color:#fde68a;background:#4b381927}.list{display:flex;flex-direction:column;gap:8px}.person,.record{border:1px solid #293d53;background:#0e1928;border-radius:11px;padding:11px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px}.person strong,.record strong{display:block;font-size:12px}.person span,.record span{display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.35}.pill{font-size:10px;white-space:nowrap;border-radius:99px;padding:6px 8px;background:#173629;color:#bbf7d0;border:1px solid #285743}.empty{font-size:12px;color:#8294a8;line-height:1.5;text-align:center;border:1px dashed #34475d;border-radius:12px;padding:18px}.log-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}.log-tools button{margin:0}.privacy{margin-top:15px;border:1px solid #66552a;background:#4a3a171f;color:#ded0a6;border-radius:13px;padding:12px 13px;font-size:11px;line-height:1.55}.privacy strong{color:#f8e7b3}footer{text-align:center;color:#71849a;font-size:10px;margin-top:16px}@media(max-width:800px){.layout{grid-template-columns:1fr}.tag{display:none}.wrap{padding:15px 11px 28px}.cam{max-height:55vh}.fields{grid-template-columns:1fr 1.2fr}}@media(max-width:390px){.fields{grid-template-columns:1fr}.head{padding:13px}.body{padding:13px}}
+</style>
 </head>
 <body>
-  <main class="wrap">
-    <header>
-      <div class="logo" aria-hidden="true">
-        <svg viewBox="0 0 32 32" fill="none"><path d="M3.5 13.5c0-2.4 1.6-4 4-4h5.2c1.8 0 3.3 1.2 3.3 3v6.1c0 2.1-1.5 3.6-3.7 3.6H8.1c-2.7 0-4.6-2-4.6-4.7v-4ZM28.5 13.5c0-2.4-1.6-4-4-4h-5.2c-1.8 0-3.3 1.2-3.3 3v6.1c0 2.1 1.5 3.6 3.7 3h4.2c2.7 0 4.6-1.4 4.6-4.1v-4Z" stroke="currentColor" stroke-width="1.7"/><path d="M15.9 13.3h.2M1.5 12.5l2.2.7M28.4 13.2l2.1-.7M9 23.2l-1.4 2.1M23 23.2l1.4 2.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-      </div>
-      <div>
-        <h1>FaceCheck</h1>
-        <div class="subtitle">Random liveness verification · Android-ready demo</div>
-      </div>
-      <div class="tag">MILESTONE 1 / 3</div>
-    </header>
-
-    <div class="grid">
-      <section class="panel">
-        <div class="panel-head">
-          <h2>Live camera</h2>
-          <span class="small-label" id="faceCount">Camera not started</span>
-        </div>
-        <div class="cam-wrap">
-          <video id="video" autoplay muted playsinline aria-label="Front camera preview"></video>
-          <div class="placeholder" id="placeholder">
-            <svg viewBox="0 0 48 48" fill="none"><rect x="5" y="11" width="38" height="27" rx="6" stroke="currentColor" stroke-width="1.8"/><circle cx="24" cy="24.5" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m17 11 2-4h10l2 4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-            <strong>Camera preview will appear here</strong>
-            <span>Allow camera permission when your browser asks.</span>
-          </div>
-          <div class="face-oval" id="faceOval" hidden></div>
-          <div class="live-pill"><span class="dot" id="liveDot"></span><span id="liveText">CAMERA OFF</span></div>
-        </div>
-        <div class="cam-foot">
-          <div class="status-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.6 5.6 7 7m10 10 1.4 1.4m0-12.8L17 7M7 17l-1.4 1.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/></svg></div>
-          <div class="status-text" id="statusText" role="status" aria-live="polite">Enable the front camera to begin. Your live frames are processed in this browser in this demo.</div>
-        </div>
-      </section>
-
-      <div class="right">
-        <section class="panel">
-          <div class="panel-head"><h2>Verification challenge</h2><span class="small-label" id="challengeNumber">WAITING</span></div>
-          <div class="challenge-body">
-            <div class="eyebrow" id="challengeEyebrow">READY TO BEGIN</div>
-            <div class="challenge-title" id="challengeTitle">Let's verify it's you.</div>
-            <p class="description" id="challengeDescription">The app will randomly choose an action. Complete it to trigger an automatic face capture.</p>
-            <div class="challenge-icon-wrap"><div class="challenge-icon" id="challengeIcon"><svg viewBox="0 0 48 48" fill="none"><path d="M5 23c4-7 10-11 19-11s15 4 19 11c-4 7-10 11-19 11S9 30 5 23Z" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="23" r="5" stroke="currentColor" stroke-width="2"/><path d="M17 5 14 9M31 5l3 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div></div>
-            <div class="progress" aria-label="Challenge progress"><span id="p1"></span><span id="p2"></span><span id="p3"></span></div>
-            <div class="buttons">
-              <button class="primary" id="cameraBtn">Enable front camera</button>
-              <button class="primary" id="verifyBtn" disabled>Start random check</button>
-              <button class="secondary" id="retryBtn" hidden>Try another random check</button>
-            </div>
-            <p class="hint" id="buttonHint">Camera permission and an internet connection are required for the first model load.</p>
-          </div>
-        </section>
-
-        <section class="panel capture-panel">
-          <div class="capture-top"><strong>Automatic capture</strong><span class="small-label" id="captureState">No capture yet</span></div>
-          <div class="capture-empty" id="captureBox"><span id="captureEmptyText">Your face image will appear here after the challenge passes.</span><img id="capturedImage" alt="Captured face preview"></div>
-        </section>
-      </div>
-    </div>
-
-    <div class="disclaimer"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 21 19H3L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9v4m0 3h.01" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><div><strong>Prototype only.</strong> This demo checks random actions and captures a preview; it does not identify an employee or save attendance records. A blink/head-turn challenge alone is not proof against every spoofing attack.</div></div>
-    <footer>FaceCheck demo · No employee database or attendance records are connected.</footer>
-  </main>
-
-  <script type="module">
-    // Load the face model only after the camera preview is running.
-    // That way, a CDN/model problem won't stop the camera button from working.
-    const $ = (id) => document.getElementById(id);
-    const video = $("video");
-    const cameraBtn = $("cameraBtn");
-    const verifyBtn = $("verifyBtn");
-    const retryBtn = $("retryBtn");
-    const placeholder = $("placeholder");
-    const faceOval = $("faceOval");
-    const liveDot = $("liveDot");
-    const liveText = $("liveText");
-    const statusText = $("statusText");
-    const challengeEyebrow = $("challengeEyebrow");
-    const challengeTitle = $("challengeTitle");
-    const challengeDescription = $("challengeDescription");
-    const challengeNumber = $("challengeNumber");
-    const challengeIcon = $("challengeIcon");
-    const faceCount = $("faceCount");
-    const captureState = $("captureState");
-    const captureEmptyText = $("captureEmptyText");
-    const capturedImage = $("capturedImage");
-    const progressBars = [$("p1"), $("p2"), $("p3")];
-
-    let stream = null;
-    let landmarker = null;
-    let rafId = null;
-    let lastVideoTime = -1;
-    let lastInferenceAt = 0;
-    let phase = "ready";
-    let currentChallenge = null;
-    let blinkCount = 0;
-    let eyesClosed = false;
-    let blinkClosedAt = 0;
-    let lastBlinkAt = 0;
-    let neutralYaw = null;
-    let challengeYawBase = null;
-    let turnFrames = 0;
-    let returnFrames = 0;
-    let turnDetected = false;
-    let actionProgress = 0;
-
-    const challenges = [
-      { id: "blink1", label: "BLINK ONCE", title: "Blink once", description: "Close both eyes, then open them again. Keep your face inside the oval.", kind: "blink", required: 1, icon: eyeIcon() },
-      { id: "blink2", label: "BLINK TWICE", title: "Blink twice", description: "Blink two separate times. Open your eyes fully between blinks.", kind: "blink", required: 2, icon: eyeIcon() },
-      { id: "turn", label: "TURN YOUR HEAD", title: "Turn your head", description: "Turn your head to either side, then look straight at the camera again.", kind: "turn", required: 1, icon: headIcon() }
-    ];
-
-    function eyeIcon() {
-      return '<svg viewBox="0 0 48 48" fill="none"><path d="M4 24s7-12 20-12 20 12 20 12-7 12-20 12S4 24 4 24Z" stroke="currentColor" stroke-width="2.3"/><circle cx="24" cy="24" r="6" stroke="currentColor" stroke-width="2.3"/><path d="M12 7 9 10m27-3 3 3" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>';
+<main class="wrap">
+<header><div class="logo" aria-hidden="true">◎</div><div><h1>FaceCheck</h1><div class="sub">Facial enrollment · Identity matching · Time In / Time Out</div></div><div class="tag">PROTOTYPE 0.3</div></header>
+<p class="intro">We'll register you as the first employee, then test whether a fresh camera scan matches your saved face template. This build stores the template and test attendance logs only in this browser on this device.</p>
+<div class="layout">
+<div class="stack">
+<section class="panel"><div class="head"><h2>Android front camera</h2><span class="small" id="cameraStatus">Not started</span></div><div class="cam"><video id="video" autoplay muted playsinline></video><div class="placeholder" id="placeholder"><div class="camicon">▣</div><strong>Camera preview appears here</strong><span>Use HTTPS in Chrome and allow camera permission when asked.</span></div><div class="oval" id="oval" hidden></div><div class="live"><span class="dot" id="dot"></span><span id="liveLabel">CAMERA OFF</span></div></div><div class="status"><div class="statusicon">✦</div><div id="statusText" role="status" aria-live="polite">Tap “Start camera & face engine” to begin. The camera starts before the recognition models load.</div></div><div class="body"><button class="primary" id="cameraBtn">Start camera & face engine</button><button class="secondary" id="stopBtn" disabled>Stop camera</button><div class="statusline" id="engineStatus">Face-recognition engine: not loaded</div></div></section>
+<section class="panel"><div class="head"><h2>Employee enrollment</h2><span class="small">Start with employee #001</span></div><div class="body"><div class="fields"><div class="field"><label for="employeeId">Employee ID</label><input id="employeeId" value="E001" maxlength="30" autocomplete="off"></div><div class="field"><label for="employeeName">Employee name</label><input id="employeeName" placeholder="Enter your name" maxlength="80" autocomplete="name"></div></div><label class="checkrow"><input id="consent" type="checkbox"><span>I understand this test creates a mathematical face template saved in this browser on this device. No face photo is saved to the attendance database in this prototype.</span></label><button class="primary" id="enrollBtn" disabled>Register my face as Employee #001</button><div class="subnote">Enrollment takes a random blink/head-turn challenge first, then samples your face several times. If this ID already exists, the existing template will be replaced only after confirmation.</div></div></section>
+</div>
+<div class="stack">
+<section class="panel"><div class="head"><h2>Random live challenge</h2><span class="small" id="challengeStatus">Waiting</span></div><div class="body"><div class="eyebrow" id="eyebrow">READY</div><div class="challengeTitle" id="challengeTitle">Let's verify it's you.</div><p class="desc" id="challengeDesc">Each registration or attendance attempt chooses a random action. Complete it before the system captures and checks your face.</p><div class="actionbanner" id="actionBanner">Possible checks: blink once, blink twice, or turn your head slightly and return to center.</div><div class="progress"><span id="p1"></span><span id="p2"></span><span id="p3"></span></div><button class="primary" id="verifyBtn" disabled>Verify identity & Time In / Time Out</button><button class="secondary" id="retryBtn" hidden>Try another random challenge</button><p class="subnote">A blink or head turn is only a basic liveness check; it is not a guarantee against advanced photo/video spoofing.</p></div></section>
+<section class="panel"><div class="head"><h2>Registered employees</h2><span class="small" id="employeeCount">0 enrolled</span></div><div class="body"><div class="list" id="employeeList"><div class="empty">No employees registered yet. Your first face template will appear here.</div></div></div></section>
+<section class="panel"><div class="head"><h2>Recent attendance</h2><span class="small" id="recordCount">0 records</span></div><div class="body"><div class="list" id="attendanceList"><div class="empty">No Time In / Time Out records yet.</div></div><div class="log-tools" style="margin-top:10px"><button class="secondary" id="exportBtn">Export attendance CSV</button><button class="danger" id="clearBtn">Clear local test data</button></div></div></section>
+</div>
+</div>
+<div class="privacy"><strong>Privacy / prototype warning:</strong> Face templates are biometric data. This demo keeps templates and logs in local browser storage, which is not a secure employee database and does not sync to other devices. Anyone with access to this browser may be able to use or erase the demo records. Do not use this prototype for official payroll or production attendance. A later version should use secure admin access, protected storage, audit logs, server timestamps, and a reviewed privacy process.</div>
+<footer>FaceCheck · Standalone prototype · Does not connect to your inventory applications</footer>
+</main>
+<script>
+(() => {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const video = $('video');
+const DB_EMPLOYEES = 'facecheck_local_employees_v1';
+const DB_ATTENDANCE = 'facecheck_local_attendance_v1';
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+const FACE_MATCH_THRESHOLD = 0.54; // Prototype threshold; calibrate using real testing before production.
+const detOpts = () => new window.faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 });
+let stream = null, modelsReady = false, modelsPromise = null, flowRunning = false, cameraBusy = false, retryMode = null;
+let employees = loadJson(DB_EMPLOYEES, []), attendance = loadJson(DB_ATTENDANCE, []), lastCaptureUrl = null;
+const challenges = [
+  { id:'blink1', title:'Blink once', description:'Close both eyes, then open them again. Keep your face inside the oval.', type:'blink', required:1 },
+  { id:'blink2', title:'Blink twice', description:'Blink twice, opening your eyes fully between blinks.', type:'blink', required:2 },
+  { id:'turn', title:'Turn your head', description:'Turn your head slightly to either side, then look straight at the camera again.', type:'turn', required:1 }
+];
+function loadJson(key, fallback) { try { const val = JSON.parse(localStorage.getItem(key) || 'null'); return val ?? fallback; } catch { return fallback; } }
+function saveJson(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+function setStatus(message) { $('statusText').textContent = message; }
+function setEngine(message, good=false) { $('engineStatus').textContent = message; $('engineStatus').className = 'statusline' + (good ? ' good' : ''); }
+function setCameraBadge(on, label) { $('dot').classList.toggle('on', on); $('liveLabel').textContent = label; $('cameraStatus').textContent = on ? 'Camera running' : 'Not started'; }
+function setProgress(n) { ['p1','p2','p3'].forEach((id,i)=>$(id).classList.toggle('ok', i<n)); }
+function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+function escapeText(v) { return String(v ?? ''); }
+function localDateKey(date = new Date()) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
+function formatTime(iso) { const d=new Date(iso); return d.toLocaleString([], {month:'short',day:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+function renderEmployees() {
+  const root=$('employeeList'); root.replaceChildren(); $('employeeCount').textContent=`${employees.length} enrolled`;
+  if (!employees.length) { const e=document.createElement('div');e.className='empty';e.textContent='No employees registered yet. Your first face template will appear here.';root.append(e);return; }
+  [...employees].sort((a,b)=>a.id.localeCompare(b.id)).forEach(e=>{const row=document.createElement('div');row.className='person';const info=document.createElement('div');const name=document.createElement('strong');name.textContent=e.name;const detail=document.createElement('span');detail.textContent=`${e.id} · ${e.samples?.length || 0} face samples · template saved on this device`;info.append(name,detail);const pill=document.createElement('span');pill.className='pill';pill.textContent='ENROLLED';row.append(info,pill);root.append(row);});
+}
+function renderAttendance() {
+  const root=$('attendanceList');root.replaceChildren();$('recordCount').textContent=`${attendance.length} records`;
+  if (!attendance.length) { const e=document.createElement('div');e.className='empty';e.textContent='No Time In / Time Out records yet.';root.append(e);return; }
+  [...attendance].slice(-8).reverse().forEach(r=>{const row=document.createElement('div');row.className='record';const info=document.createElement('div');const name=document.createElement('strong');name.textContent=`${r.name} · ${r.event.replace('_',' ')}`;const detail=document.createElement('span');detail.textContent=`${r.employeeId} · ${formatTime(r.timestamp)}`;info.append(name,detail);const pill=document.createElement('span');pill.className='pill';pill.textContent=r.event==='TIME_IN'?'IN':'OUT';row.append(info,pill);root.append(row);});
+}
+function refreshButtons() { const can=modelsReady && !!stream && !flowRunning; $('enrollBtn').disabled=!can; $('verifyBtn').disabled=!can || employees.length===0; $('stopBtn').disabled=!stream || flowRunning; $('cameraBtn').disabled=cameraBusy || (modelsReady && !!stream); $('cameraBtn').textContent=modelsReady && stream?'Camera & face engine ready':stream?'Retry face engine':'Start camera & face engine'; }
+async function loadFaceApiLibrary() {
+  if (window.faceapi) return;
+  await new Promise((resolve,reject)=>{
+    const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js';script.async=true;
+    const timeout=setTimeout(()=>{script.remove();reject(new Error('Face library download timed out. Check internet access, then try loading the face engine again.'));},25000);
+    script.onload=()=>{clearTimeout(timeout);resolve();};script.onerror=()=>{clearTimeout(timeout);reject(new Error('Could not download the face library from the CDN. Check internet access or try again later.'));};document.head.append(script);
+  });
+}
+async function loadModels() {
+  if(modelsReady)return;
+  if(modelsPromise)return modelsPromise;
+  modelsPromise=(async()=>{
+    setEngine('Loading face-detection, landmarks and recognition models…');
+    await loadFaceApiLibrary();
+    await Promise.all([
+      window.faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+      window.faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL),
+      window.faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+    ]);
+    modelsReady=true;setEngine('Face-recognition engine loaded',true);
+  })();
+  try{await modelsPromise;}finally{modelsPromise=null;}
+}
+async function startCameraAndModels() {
+  if(cameraBusy)return;cameraBusy=true;refreshButtons();
+  try {
+    if(!stream){
+      if(!navigator.mediaDevices?.getUserMedia)throw new Error('Camera access is unavailable. Open this page through HTTPS in Chrome.');
+      setStatus('Requesting permission to use the front camera…');
+      stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'user'},width:{ideal:640},height:{ideal:480},frameRate:{ideal:20,max:24}}});
+      video.srcObject=stream;
+      await new Promise((resolve,reject)=>{if(video.readyState>=2){resolve();return;}const timer=setTimeout(()=>reject(new Error('Camera permission was granted, but the preview did not start. Close other camera apps and retry.')),12000);video.addEventListener('loadeddata',()=>{clearTimeout(timer);resolve();},{once:true});video.addEventListener('error',()=>{clearTimeout(timer);reject(new Error('The browser could not display the camera feed. Reload and retry.'));},{once:true});});
+      await video.play();$('placeholder').hidden=true;$('oval').hidden=false;setCameraBadge(true,'CAMERA ON');
     }
-    function headIcon() {
-      return '<svg viewBox="0 0 48 48" fill="none"><path d="M24 8c-9 0-15 7-15 16v5c0 7 5 11 11 11h8c6 0 11-4 11-11v-5C39 15 33 8 24 8Z" stroke="currentColor" stroke-width="2.3"/><path d="M4 18h8m-4-4 4 4-4 4M44 18h-8m4-4-4 4 4 4" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 24h.1M30 24h.1" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>';
-    }
-    function setStatus(message) { statusText.textContent = message; }
-    function setProgress(n) { progressBars.forEach((bar, i) => bar.classList.toggle("active", i < n)); }
-    function setCameraState(on, text) {
-      liveDot.classList.toggle("on", on);
-      liveText.textContent = text;
-    }
-
-    async function setupLandmarker() {
-      setStatus("Camera is on. Loading the face landmark model; the first load may take a little time.");
-      const { FaceLandmarker, FilesetResolver } = await import(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/vision_bundle.mjs"
-      );
-      const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm");
-      landmarker = await FaceLandmarker.createFromOptions(vision, {
-        baseOptions: { modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task" },
-        runningMode: "VIDEO",
-        numFaces: 2,
-        outputFaceBlendshapes: true,
-        outputFacialTransformationMatrixes: false,
-        minFaceDetectionConfidence: 0.55,
-        minFacePresenceConfidence: 0.55,
-        minTrackingConfidence: 0.55
-      });
-    }
-
-    async function enableCamera() {
-      cameraBtn.disabled = true;
-      cameraBtn.textContent = stream ? "Loading face model…" : "Starting camera…";
-
-      // Stage 1: start the camera independently of the remote face model.
-      try {
-        if (!stream) {
-          if (!navigator.mediaDevices?.getUserMedia) {
-            throw new Error("Camera access is unavailable. Open this page through HTTPS in Chrome, then try again.");
-          }
-          stream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: { facingMode: { ideal: "user" }, width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24, max: 30 } }
-          });
-          video.srcObject = stream;
-          await new Promise((resolve, reject) => {
-            if (video.readyState >= 2) { resolve(); return; }
-            const timeoutId = setTimeout(() => reject(new Error("The camera was allowed, but its video preview did not start. Close other camera apps and try again.")), 10000);
-            video.addEventListener("loadeddata", () => { clearTimeout(timeoutId); resolve(); }, { once: true });
-            video.addEventListener("error", () => { clearTimeout(timeoutId); reject(new Error("The camera feed could not be displayed. Reload the page and try again.")); }, { once: true });
-          });
-          await video.play();
-          placeholder.hidden = true;
-          faceOval.hidden = false;
-          setCameraState(true, "CAMERA ON");
-          setStatus("Camera is on. Loading facial verification…");
-        }
-      } catch (error) {
-        console.error("Camera start failed:", error);
-        if (stream) stream.getTracks().forEach((track) => track.stop());
-        stream = null;
-        video.srcObject = null;
-        cameraBtn.disabled = false;
-        cameraBtn.textContent = "Try enabling camera again";
-        setCameraState(false, "CAMERA ERROR");
-        if (error?.name === "NotAllowedError" || error?.name === "SecurityError") {
-          setStatus("Camera permission was blocked. In Chrome, allow Camera for this website, then reload the page. The site must use HTTPS.");
-        } else if (error?.name === "NotFoundError" || error?.name === "OverconstrainedError") {
-          setStatus("No usable front camera was found. Check that your device has a working camera, then try again.");
-        } else if (error?.name === "NotReadableError" || error?.name === "AbortError") {
-          setStatus("The camera may be in use by another app. Close other camera/video-call apps, then try again.");
-        } else {
-          setStatus(error?.message || "Could not start the camera. Check HTTPS and the browser's camera permission.");
-        }
-        return;
+    setStatus('Camera is running. Loading the real face-recognition engine and its model files…');
+    try{await loadModels();setStatus('Camera and face-recognition engine are ready. Register your face to begin.');}
+    catch(e){console.error(e);setEngine('Engine not ready — retry needed');setStatus(`Camera is on, but face recognition did not load: ${e.message}`);}
+  } catch(e) {
+    console.error(e);
+    if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;}
+    $('placeholder').hidden=false;$('oval').hidden=true;setCameraBadge(false,'CAMERA ERROR');setEngine('Face-recognition engine: not loaded');
+    if(e.name==='NotAllowedError'||e.name==='SecurityError')setStatus('Camera permission is blocked. In Chrome, allow Camera for this HTTPS website, then reload the page.');
+    else if(e.name==='NotFoundError'||e.name==='OverconstrainedError')setStatus('No working camera was found. Check your device camera and try again.');
+    else if(e.name==='NotReadableError'||e.name==='AbortError')setStatus('Another app may be using the camera. Close other camera/video-call apps, then retry.');
+    else setStatus(e.message||'Could not start the camera.');
+  } finally {cameraBusy=false;refreshButtons();}
+}
+async function stopCamera() {
+  if(flowRunning)return;
+  if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;$('placeholder').hidden=false;$('oval').hidden=true;setCameraBadge(false,'CAMERA OFF');setStatus('Camera stopped. Your locally saved employee templates and attendance records remain on this device.');refreshButtons();
+}
+async function readFaces(withDescriptors=false) {
+  const chain=window.faceapi.detectAllFaces(video,detOpts()).withFaceLandmarks(true);
+  return withDescriptors ? chain.withFaceDescriptors() : chain;
+}
+function eyeAspectRatio(points, indices) {
+  const p=indices.map(i=>points[i]);const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  return (distance(p[1],p[5])+distance(p[2],p[4]))/(2*Math.max(1,distance(p[0],p[3])));
+}
+function average(values){return values.reduce((a,b)=>a+b,0)/Math.max(1,values.length);}
+function features(face) {
+  const pts=face.landmarks.positions;
+  const ear=(eyeAspectRatio(pts,[36,37,38,39,40,41])+eyeAspectRatio(pts,[42,43,44,45,46,47]))/2;
+  const a=pts[36],b=pts[45],nose=pts[30];const minX=Math.min(a.x,b.x),maxX=Math.max(a.x,b.x);
+  const noseRatio=(nose.x-minX)/Math.max(1,maxX-minX);
+  return {ear,noseRatio,width:face.detection.box.width};
+}
+function chooseChallenge(){return challenges[Math.floor(Math.random()*challenges.length)];}
+async function runChallenge() {
+  const challenge=chooseChallenge();setProgress(0);$('challengeStatus').textContent='Active';$('eyebrow').textContent='LIVE CHALLENGE';$('challengeTitle').textContent=challenge.title;$('challengeDesc').textContent=challenge.description;$('actionBanner').textContent='Follow the instruction on screen. Capture and matching happen automatically only after the action is detected.';setStatus(`Challenge: ${challenge.title}. Keep only your face in the frame.`);
+  let blinkClosed=false,blinkCount=0,closedAt=0,neutralSamples=[],neutral=null,moved=false,returned=0,frames=0;
+  const deadline=Date.now()+22000;
+  while(Date.now()<deadline){
+      if(!stream||!video.videoWidth)throw new Error('The camera stopped. Start it again and retry.');
+      let faces=[];try{faces=await readFaces(false);}catch(e){console.warn('Face inference:',e);await wait(180);continue;}
+      frames++;
+      if(faces.length!==1){$('cameraStatus').textContent=faces.length===0?'Looking for face…':'Multiple faces detected';setStatus(faces.length===0?'Position your face inside the oval, in good lighting.':'Only one person may be in the camera frame during verification.');await wait(160);continue;}
+      $('cameraStatus').textContent='1 face detected';const f=features(faces[0]);if(f.width<85){setStatus('Move a little closer to the camera.');await wait(160);continue;}
+      if(challenge.type==='blink'){
+        if(f.ear<0.19&&!blinkClosed){blinkClosed=true;closedAt=Date.now();}
+        else if(f.ear>0.225&&blinkClosed){const dur=Date.now()-closedAt;blinkClosed=false;if(dur>45&&dur<1200){blinkCount++;setProgress(Math.min(3,blinkCount));setStatus(`Blink detected: ${blinkCount} of ${challenge.required}.`);if(blinkCount>=challenge.required){$('challengeStatus').textContent='Passed';$('eyebrow').textContent='LIVENESS PASSED';setProgress(3);return challenge;}}}
+      }else{
+        if(neutral===null){neutralSamples.push(f.noseRatio);if(neutralSamples.length>=8){neutral=average(neutralSamples);setStatus('Face centered. Now turn your head slightly to either side.');}}
+        else if(!moved&&Math.abs(f.noseRatio-neutral)>0.095){moved=true;setProgress(1);setStatus('Head turn detected. Now return to face the camera straight on.');}
+        else if(moved&&Math.abs(f.noseRatio-neutral)<0.045){returned++;setProgress(returned>=2?3:2);if(returned>=2){$('challengeStatus').textContent='Passed';$('eyebrow').textContent='LIVENESS PASSED';setStatus('Head turn and return detected.');return challenge;}}
+        else if(moved){returned=0;}
       }
-
-      // Stage 2: load the facial model. If it fails, keep the live camera running
-      // and let the user retry the model download without re-requesting camera access.
-      try {
-        if (!landmarker) await setupLandmarker();
-        cameraBtn.textContent = "Camera ready";
-        cameraBtn.disabled = true;
-        verifyBtn.disabled = false;
-        verifyBtn.focus({ preventScroll: true });
-        setStatus("Camera and face model ready. Position one face in the oval, then start the random check.");
-        $("buttonHint").textContent = "Only the liveness demo runs now. Captured images are not uploaded or saved.";
-        if (rafId) cancelAnimationFrame(rafId);
-        renderLoop();
-      } catch (error) {
-        console.error("Face model load failed:", error);
-        cameraBtn.disabled = false;
-        cameraBtn.textContent = "Retry face model";
-        verifyBtn.disabled = true;
-        setCameraState(true, "CAMERA ON");
-        setStatus("The camera is on, but the facial model could not load. Check your internet connection or try again. Details: " + (error?.message || "model download failed"));
-      }
+      await wait(140);
     }
-
-    function getBlinkScore(result) {
-      const categories = result.faceBlendshapes?.[0]?.categories || [];
-      const left = categories.find((item) => item.categoryName === "eyeBlinkLeft")?.score ?? 0;
-      const right = categories.find((item) => item.categoryName === "eyeBlinkRight")?.score ?? 0;
-      return (left + right) / 2;
-    }
-
-    function getYawSignal(landmarks) {
-      if (!landmarks || landmarks.length < 264) return null;
-      const nose = landmarks[1];
-      const eyeA = landmarks[33];
-      const eyeB = landmarks[263];
-      const eyeMidX = (eyeA.x + eyeB.x) / 2;
-      const eyeSpan = Math.max(0.001, Math.abs(eyeB.x - eyeA.x));
-      return (nose.x - eyeMidX) / eyeSpan;
-    }
-
-    function beginRandomCheck() {
-      if (!landmarker || !stream) return;
-      currentChallenge = challenges[Math.floor(Math.random() * challenges.length)];
-      phase = "challenge";
-      blinkCount = 0;
-      eyesClosed = false;
-      blinkClosedAt = 0;
-      lastBlinkAt = 0;
-      challengeYawBase = neutralYaw;
-      turnFrames = 0;
-      returnFrames = 0;
-      turnDetected = false;
-      actionProgress = 0;
-      setProgress(0);
-      challengeNumber.textContent = "RANDOM CHECK";
-      challengeEyebrow.textContent = "COMPLETE THIS ACTION";
-      challengeTitle.textContent = currentChallenge.title;
-      challengeDescription.textContent = currentChallenge.description;
-      challengeIcon.innerHTML = currentChallenge.icon;
-      verifyBtn.hidden = true;
-      verifyBtn.disabled = true;
-      retryBtn.hidden = true;
-      captureState.textContent = "Waiting for action";
-      captureEmptyText.textContent = "Your face image will appear here after the challenge passes.";
-      capturedImage.style.display = "none";
-      capturedImage.removeAttribute("src");
-      setStatus("Follow the instruction. Capture will happen automatically after the action succeeds.");
-    }
-
-    function markActionProgress(n) {
-      actionProgress = n;
-      setProgress(n);
-    }
-
-    function processChallenge(result, now, yaw) {
-      if (currentChallenge.kind === "blink") {
-        const score = getBlinkScore(result);
-        if (!eyesClosed && score >= 0.58 && (now - lastBlinkAt) > 220) {
-          eyesClosed = true;
-          blinkClosedAt = now;
-        } else if (eyesClosed && score <= 0.30) {
-          const closedDuration = now - blinkClosedAt;
-          eyesClosed = false;
-          if (closedDuration >= 55 && closedDuration <= 900 && (now - lastBlinkAt) > 220) {
-            blinkCount += 1;
-            lastBlinkAt = now;
-            markActionProgress(Math.min(blinkCount, currentChallenge.required));
-            challengeDescription.textContent = currentChallenge.required === 2
-              ? `Blink detected: ${blinkCount} of 2. Open your eyes fully between blinks.`
-              : "Blink detected. Verifying…";
-            if (blinkCount >= currentChallenge.required) finishCapture();
-          }
-        }
-      } else if (currentChallenge.kind === "turn") {
-        if (yaw === null || challengeYawBase === null) return;
-        const difference = Math.abs(yaw - challengeYawBase);
-        if (!turnDetected) {
-          turnFrames = difference >= 0.16 ? turnFrames + 1 : Math.max(0, turnFrames - 1);
-          if (turnFrames >= 3) {
-            turnDetected = true;
-            markActionProgress(1);
-            challengeDescription.textContent = "Head turn detected. Now look straight at the camera again.";
-            setStatus("Good. Return your face to the center to finish the challenge.");
-          }
-        } else {
-          returnFrames = difference <= 0.075 ? returnFrames + 1 : 0;
-          if (returnFrames >= 3) finishCapture();
-        }
-      }
-    }
-
-    function finishCapture() {
-      if (phase !== "challenge") return;
-      if (!video.videoWidth || !video.videoHeight) {
-        setStatus("The camera image is not ready yet. Please try again.");
-        return;
-      }
-      phase = "done";
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      capturedImage.src = canvas.toDataURL("image/jpeg", 0.88);
-      capturedImage.style.display = "block";
-      captureEmptyText.style.display = "none";
-      captureState.textContent = "Captured in this browser";
-      challengeNumber.textContent = "PASSED";
-      challengeEyebrow.textContent = "ACTION COMPLETED";
-      challengeTitle.textContent = "Challenge passed!";
-      challengeDescription.textContent = "A face preview was captured. Employee identity matching and attendance logging are not connected in this demo.";
-      challengeIcon.innerHTML = '<svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke="currentColor" stroke-width="2.5"/><path d="m15 24 6 6 13-14" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      setProgress(3);
-      setStatus("Random action passed and face preview captured. No image was uploaded or saved by this demo.");
-      verifyBtn.hidden = true;
-      retryBtn.hidden = false;
-      retryBtn.focus({ preventScroll: true });
-    }
-
-    function renderLoop() {
-      if (!stream || !landmarker) return;
-      rafId = requestAnimationFrame(renderLoop);
-      const now = performance.now();
-      if (video.readyState < 2 || video.currentTime === lastVideoTime || now - lastInferenceAt < 65) return;
-      lastVideoTime = video.currentTime;
-      lastInferenceAt = now;
-      try {
-        const result = landmarker.detectForVideo(video, now);
-        const faces = result.faceLandmarks || [];
-        faceCount.textContent = faces.length === 0 ? "No face detected" : `${faces.length} face${faces.length > 1 ? "s" : ""} detected`;
-        if (faces.length !== 1) {
-          if (phase === "challenge") {
-            setStatus(faces.length === 0 ? "Move into the oval so the camera can see your face." : "Only one person should be in the camera frame.");
-          } else if (phase === "ready") {
-            setStatus(faces.length === 0 ? "Position one face in the oval, then start the random check." : "More than one face is visible. Keep only the employee in the frame.");
-          }
-          return;
-        }
-        const yaw = getYawSignal(faces[0]);
-        if (phase === "ready" && yaw !== null) neutralYaw = neutralYaw === null ? yaw : neutralYaw * 0.92 + yaw * 0.08;
-        if (phase === "challenge") processChallenge(result, now, yaw);
-      } catch (error) {
-        console.warn("Face landmark frame skipped:", error);
-      }
-    }
-
-    cameraBtn.addEventListener("click", enableCamera);
-    verifyBtn.addEventListener("click", beginRandomCheck);
-    retryBtn.addEventListener("click", () => {
-      phase = "ready";
-      currentChallenge = null;
-      retryBtn.hidden = true;
-      verifyBtn.hidden = false;
-      verifyBtn.disabled = false;
-      challengeNumber.textContent = "WAITING";
-      challengeEyebrow.textContent = "READY TO BEGIN";
-      challengeTitle.textContent = "Let's verify it's you.";
-      challengeDescription.textContent = "The next attempt will randomly choose an action. Complete it to trigger an automatic face capture.";
-      challengeIcon.innerHTML = eyeIcon();
-      setProgress(0);
-      captureState.textContent = "No capture yet";
-      captureEmptyText.style.display = "block";
-      captureEmptyText.textContent = "Your face image will appear here after the challenge passes.";
-      capturedImage.style.display = "none";
-      capturedImage.removeAttribute("src");
-      setStatus("Ready for another random check. The camera is still on.");
-    });
-
-    window.addEventListener("pagehide", () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      if (stream) stream.getTracks().forEach((track) => track.stop());
-      if (landmarker) landmarker.close();
-    });
-  </script>
+  $('challengeStatus').textContent='Timed out';$('eyebrow').textContent='TRY AGAIN';setStatus('The action was not detected in time. Keep your face centered and try another random check.');return null;
+}
+async function collectDescriptors(count=5) {
+  const vectors=[];
+  for(let i=0;i<count;i++){
+    const faces=await readFaces(true);
+    if(faces.length!==1)throw new Error(faces.length===0?'Face not detected. Keep your face in frame and try again.':'More than one face is visible. Make sure only you are in frame.');
+    if(faces[0].detection.box.width<85)throw new Error('Move closer to the camera and try again.');
+    vectors.push(Array.from(faces[0].descriptor));
+    $('eyebrow').textContent=`CAPTURING FACE ${i+1}/${count}`;setProgress(Math.min(3,Math.ceil(((i+1)/count)*3)));
+    await wait(220);
+  }
+  return vectors;
+}
+function capturePreview() {
+  try{const canvas=document.createElement('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;const ctx=canvas.getContext('2d');ctx.translate(canvas.width,0);ctx.scale(-1,1);ctx.drawImage(video,0,0);const url=canvas.toDataURL('image/jpeg',0.82);if(lastCaptureUrl)URL.revokeObjectURL(lastCaptureUrl);const img=$('capturedImage');img.src=url;img.style.display='block';$('capturePlaceholder').hidden=true;return true;}catch(e){console.warn('Preview capture failed',e);return false;}
+}
+function calcDistance(a,b){if(!a||!b||a.length!==b.length)return Infinity;let sum=0;for(let i=0;i<a.length;i++){const d=a[i]-b[i];sum+=d*d;}return Math.sqrt(sum);}
+function findBestMatch(querySamples){let best=null;for(const e of employees){const samples=(e.samples||[]);const distances=querySamples.map(q=>Math.min(...samples.map(s=>calcDistance(q,s))));const sorted=distances.sort((a,b)=>a-b);const score=sorted[Math.floor(sorted.length/2)]??Infinity;if(!best||score<best.distance)best={employee:e,distance:score};}return best;}
+function recordAttendance(employee){const today=localDateKey();const todays=attendance.filter(r=>r.employeeId===employee.id&&localDateKey(new Date(r.timestamp))===today).sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));const last=todays[todays.length-1];const event=last?.event==='TIME_IN'?'TIME_OUT':'TIME_IN';const row={employeeId:employee.id,name:employee.name,event,timestamp:new Date().toISOString(),source:'local-prototype'};attendance.push(row);saveJson(DB_ATTENDANCE,attendance);renderAttendance();return row;}
+async function enroll() {
+  if(!modelsReady||!stream||flowRunning)return;
+  const id=$('employeeId').value.trim(),name=$('employeeName').value.trim();
+  if(!id||!name){setStatus('Enter an employee ID and your name before enrolling.');return;}
+  if(!$('consent').checked){setStatus('Please check the consent box to confirm you understand the local biometric-template test.');return;}
+  const index=employees.findIndex(e=>e.id.toLowerCase()===id.toLowerCase());if(index>=0&&!confirm(`Employee ID ${id} already exists. Replace its saved face template?`))return;
+  flowRunning=true;retryMode='enroll';refreshButtons();
+  try{
+    const challenge=await runChallenge();if(!challenge){$('retryBtn').hidden=false;retryMode='enroll';return;}
+    setStatus('Challenge passed. Capturing several face samples for your local template…');const samples=await collectDescriptors(5);capturePreview();
+    const employee={id,name,samples,createdAt:new Date().toISOString(),templateVersion:1};
+    if(index>=0)employees[index]=employee;else employees.push(employee);
+    saveJson(DB_EMPLOYEES,employees);renderEmployees();setStatus(`${name} (${id}) is registered on this device. Now use “Verify identity & Time In / Time Out” to test a fresh match.`);$('eyebrow').textContent='ENROLLMENT COMPLETE';$('challengeStatus').textContent='Registered';$('actionBanner').textContent='Face template saved locally. No face photo was saved to local storage.';$('retryBtn').hidden=true;retryMode=null;
+  }catch(e){console.error(e);setStatus(`Enrollment could not finish: ${e.message}`);}
+  finally{flowRunning=false;refreshButtons();}
+}
+async function verifyAndClock() {
+  if(!modelsReady||!stream||flowRunning||employees.length===0)return;
+  flowRunning=true;retryMode='verify';refreshButtons();
+  try{
+    const challenge=await runChallenge();if(!challenge){$('retryBtn').hidden=false;retryMode='verify';return;}
+    setStatus('Challenge passed. Comparing your live face against registered employee templates…');const query=await collectDescriptors(3);capturePreview();
+    const match=findBestMatch(query);
+    if(!match||match.distance>FACE_MATCH_THRESHOLD){$('eyebrow').textContent='NO MATCH';$('challengeStatus').textContent='Not recognized';$('actionBanner').textContent='No registered employee matched confidently. No attendance record was created.';setStatus(`Face not recognized (match distance ${match?match.distance.toFixed(3):'unavailable'}; prototype limit ${FACE_MATCH_THRESHOLD}). Try again with steady lighting and the same distance as enrollment.`);$('retryBtn').hidden=false;retryMode='verify';return;}
+    const rec=recordAttendance(match.employee);$('eyebrow').textContent='IDENTITY VERIFIED';$('challengeStatus').textContent='Match confirmed';$('challengeTitle').textContent=`Welcome, ${match.employee.name}`;$('actionBanner').textContent=`${match.employee.id} · ${rec.event.replace('_',' ')} recorded locally at ${new Date(rec.timestamp).toLocaleTimeString()}.`;setStatus(`Recognized ${match.employee.name} (${match.employee.id}) with match distance ${match.distance.toFixed(3)}. Attendance event: ${rec.event.replace('_',' ')}.`);$('retryBtn').hidden=true;retryMode=null;
+  }catch(e){console.error(e);setStatus(`Verification could not finish: ${e.message}`);}
+  finally{flowRunning=false;refreshButtons();}
+}
+function exportCsv(){if(!attendance.length){setStatus('There are no attendance records to export yet.');return;}const quote=v=>`"${String(v??'').replace(/"/g,'""')}"`;const rows=[['Employee ID','Employee Name','Event','Timestamp (local display)','Timestamp (ISO)'],...attendance.map(r=>[r.employeeId,r.name,r.event,formatTime(r.timestamp),r.timestamp])];const csv=rows.map(row=>row.map(quote).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`facecheck-attendance-${localDateKey()}.csv`;document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);}
+function clearLocalData(){if(!confirm('This permanently removes all FaceCheck employee templates and attendance logs saved in this browser. Continue?'))return;localStorage.removeItem(DB_EMPLOYEES);localStorage.removeItem(DB_ATTENDANCE);employees=[];attendance=[];renderEmployees();renderAttendance();$('capturedImage').removeAttribute('src');$('capturedImage').style.display='none';$('capturePlaceholder').hidden=false;setStatus('Local FaceCheck test data was cleared from this browser.');$('challengeTitle').textContent="Let's verify it's you.";$('actionBanner').textContent='Possible checks: blink once, blink twice, or turn your head slightly and return to center.';refreshButtons();}
+$('cameraBtn').addEventListener('click',startCameraAndModels);$('stopBtn').addEventListener('click',stopCamera);$('enrollBtn').addEventListener('click',enroll);$('verifyBtn').addEventListener('click',verifyAndClock);$('retryBtn').addEventListener('click',()=>{const mode=retryMode;$('retryBtn').hidden=true;if(mode==='enroll')enroll();else verifyAndClock();});$('exportBtn').addEventListener('click',exportCsv);$('clearBtn').addEventListener('click',clearLocalData);
+// Create the capture image elements in the camera flow's status UI without saving images persistently.
+const style=document.createElement('style');style.textContent='.captured-mini{display:none;width:88px;height:66px;object-fit:cover;border-radius:8px;border:1px solid #34475d}';document.head.append(style);
+// Tiny preview slot below the engine status.
+const engine=$('engineStatus');const capturePreviewSlot=document.createElement('div');capturePreviewSlot.style.cssText='display:flex;gap:10px;align-items:center;margin-top:8px';const capturedImage=document.createElement('img');capturedImage.id='capturedImage';capturedImage.className='captured-mini';capturedImage.alt='Temporary capture preview';const capturePlaceholder=document.createElement('span');capturePlaceholder.id='capturePlaceholder';capturePlaceholder.className='small';capturePlaceholder.textContent='No capture yet';capturePreviewSlot.append(capturedImage,capturePlaceholder);engine.insertAdjacentElement('afterend',capturePreviewSlot);window.addEventListener('beforeunload',()=>{if(stream)stream.getTracks().forEach(t=>t.stop());});
+renderEmployees();renderAttendance();refreshButtons();
+})();
+</script>
 </body>
 </html>
