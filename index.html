@@ -12,8 +12,8 @@
 </head>
 <body>
 <main class="wrap">
-<header><div class="logo" aria-hidden="true">◎</div><div><h1>FaceCheck</h1><div class="sub">Facial enrollment · Identity matching · Time In / Time Out</div></div><div class="tag">SUPABASE CLOUD BUILD 0.5</div></header>
-<p class="intro">Cloud-connected prototype: this app is preconfigured for your FaceCheck Supabase project. The public Project URL and publishable key are built in, so employees do not need to enter database settings. Sign in with your Supabase Auth owner account before enrolling an employee.</p>
+<header><div class="logo" aria-hidden="true">◎</div><div><h1>FaceCheck</h1><div class="sub">Facial enrollment · Identity matching · Time In / Time Out</div></div><div class="tag">SUPABASE + APPS SCRIPT BUILD 0.6</div></header>
+<p class="intro">Cloud-connected prototype: the Project URL and publishable key are built in. Google Apps Script sends the Supabase confirmation email, while Supabase Auth still manages the signed-in session and database security.</p>
 <section class="panel" id="cloudPanel" style="margin-bottom:15px">
   <div class="head"><h2>Supabase database connection</h2><span class="small" id="cloudBadge">Starting connection…</span></div>
   <div class="body">
@@ -21,12 +21,13 @@
     <p class="subnote">Project URL and public publishable key are built into this app. No database key entry is needed here. Only a publishable key is used in the browser; never place a Supabase secret/service-role key in this website.</p>
     <div id="authPanel" hidden style="margin-top:16px;border-top:1px solid var(--line);padding-top:15px">
       <div class="eyebrow" id="authHeading">OWNER ACCOUNT</div>
-      <p class="subnote" style="margin:6px 0 12px">Create or sign in to your Supabase Auth owner account. The database uses Row Level Security to limit rows to this signed-in account.</p>
+      <p class="subnote" style="margin:6px 0 12px">Create your account using the Apps Script email sender, then confirm it from your inbox. Supabase Auth manages the signed-in session and Row Level Security limits records to your account.</p>
       <div class="fields" style="grid-template-columns:1fr 1fr">
         <div class="field"><label for="ownerEmail">Owner email</label><input id="ownerEmail" type="email" placeholder="you@example.com" autocomplete="username"></div>
-        <div class="field"><label for="ownerPassword">Password (8+ characters)</label><input id="ownerPassword" type="password" placeholder="Password" autocomplete="current-password"></div>
+        <div class="field"><label for="ownerPassword">Password (8+ characters)</label><input id="ownerPassword" type="password" placeholder="Choose a password" autocomplete="new-password"></div>
+        <div class="field"><label for="ownerSetupCode">One-time owner setup code</label><input id="ownerSetupCode" type="password" placeholder="Set in Apps Script properties" autocomplete="off"></div>
       </div>
-      <div class="log-tools"><button class="primary" id="createAccountBtn">Create owner account</button><button class="secondary" id="signInBtn">Sign in</button></div>
+      <div class="log-tools"><button class="primary" id="createAccountBtn">Send confirmation email</button><button class="secondary" id="signInBtn">Sign in</button></div>
       <button class="danger" id="signOutBtn" hidden>Sign out</button>
       <div class="statusline" id="authStatus">Connecting to your owner account…</div>
     </div>
@@ -55,6 +56,8 @@ const video = $('video');
 // Browser-safe project configuration. These are deliberately public credentials, not secrets.
 const SUPABASE_URL = 'https://ppqmytbkqxluexrovccw.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_bnrXdg0t7mriqgxAFDG1Dg_0ifip08N';
+// Paste your deployed Google Apps Script Web App URL ending in /exec here. This is a public endpoint URL, not a secret.
+const APPS_SCRIPT_SIGNUP_URL = 'https://script.google.com/macros/s/AKfycbzcsWeiK4cvoxNAAYos-RoVK1zaDpTM0uU-ErmWOcMhZW5kb4Q_TezBsa4C6r1Z2FJr1A/exec';
 const TABLE_EMPLOYEES = 'facecheck_employees';
 const TABLE_TEMPLATES = 'facecheck_face_templates';
 const TABLE_ATTENDANCE = 'facecheck_attendance';
@@ -277,7 +280,7 @@ function updateAuthUi(){
   $('ownerEmail').disabled=signedIn;$('ownerPassword').disabled=signedIn;
   $('authHeading').textContent=signedIn?'OWNER ACCOUNT CONNECTED':'OWNER ACCOUNT';
   if(signedIn){$('authStatus').textContent=`Signed in as ${currentSession.user.email}.`;$('authStatus').className='statusline good';}
-  else if(supabaseClient){$('authStatus').textContent='Create your owner account or sign in to load your cloud tables.';$('authStatus').className='statusline';}
+  else if(supabaseClient){$('authStatus').textContent='Send an email confirmation through Apps Script, then sign in to load your cloud tables.';$('authStatus').className='statusline';}
   else {$('authStatus').textContent='Connect your Supabase project first.';$('authStatus').className='statusline';}
 }
 async function connectSupabase(){
@@ -291,21 +294,31 @@ async function connectSupabase(){
     supabaseClient=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
     const {data,error}=await supabaseClient.auth.getSession();if(error)throw error;
     currentSession=data.session||null;updateAuthUi();
-    $('cloudBadge').textContent='Project configured';$('cloudStatus').textContent='Supabase client initialized. Create your owner account or sign in below. After signing in, FaceCheck will read the tables created by your SQL script.';$('cloudStatus').className='statusline good';
+    $('cloudBadge').textContent='Project configured';$('cloudStatus').textContent='Supabase client initialized. Send the signup confirmation through Google Apps Script, then confirm the email and sign in. FaceCheck uses the tables created by your SQL script.';$('cloudStatus').className='statusline good';
     if(currentSession)await loadCloudData();
   }catch(e){console.error(e);$('cloudBadge').textContent='Connection failed';$('cloudStatus').textContent=`Could not initialize Supabase: ${e.message||e}`;$('cloudStatus').className='statusline warn';}
   finally{refreshButtons();}
 }
-async function createOwnerAccount(){
-  if(!supabaseClient){$('authStatus').textContent='Connect your Supabase project first.';return;}
-  const email=$('ownerEmail').value.trim(),password=$('ownerPassword').value;
-  if(!email||password.length<8){$('authStatus').textContent='Enter a valid email and a password of at least 8 characters.';$('authStatus').className='statusline warn';return;}
-  $('createAccountBtn').disabled=true;$('authStatus').textContent='Creating your Supabase Auth owner account…';
-  try{const redirectUrl=window.location.origin+window.location.pathname;const {data,error}=await supabaseClient.auth.signUp({email,password,options:{emailRedirectTo:redirectUrl}});if(error)throw error;
-    if(data.session){currentSession=data.session;updateAuthUi();await loadCloudData();}
-    else{$('authStatus').textContent='Account request submitted. If email confirmation is enabled in Supabase, open the confirmation email, then return and sign in.';$('authStatus').className='statusline good';}
-  }catch(e){$('authStatus').textContent=`Account creation failed: ${e.message||e}`;$('authStatus').className='statusline warn';}
-  finally{$('createAccountBtn').disabled=false;}
+function createOwnerAccount(){
+  if(!supabaseClient){$('authStatus').textContent='Connect to Supabase first; then request the confirmation email.';$('authStatus').className='statusline warn';return;}
+  const email=$('ownerEmail').value.trim().toLowerCase(),password=$('ownerPassword').value,setupCode=$('ownerSetupCode').value;
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||password.length<8||!setupCode){$('authStatus').textContent='Enter a valid email, a password of at least 8 characters, and the one-time owner setup code configured in Apps Script.';$('authStatus').className='statusline warn';return;}
+  if(!APPS_SCRIPT_SIGNUP_URL||!APPS_SCRIPT_SIGNUP_URL.startsWith('https://script.google.com/macros/s/')||!APPS_SCRIPT_SIGNUP_URL.endsWith('/exec')){
+    $('authStatus').textContent='Apps Script is not connected yet. Deploy the Apps Script as a Web App, then paste its URL ending in /exec into APPS_SCRIPT_SIGNUP_URL in index.html.';$('authStatus').className='statusline warn';return;
+  }
+  // Open a tab synchronously from this click, then POST credentials in the request body (never in the URL).
+  const targetName='facecheckSignupConfirmation';
+  const resultTab=window.open('about:blank',targetName);
+  if(!resultTab){$('authStatus').textContent='Your browser blocked the result tab. Allow pop-ups for this FaceCheck site, then try again.';$('authStatus').className='statusline warn';return;}
+  try{
+    resultTab.document.write('<!doctype html><title>FaceCheck confirmation</title><p style="font:16px system-ui;padding:24px">Contacting the confirmation service…</p>');
+  }catch(_){/* Cross-origin restrictions after navigation are expected. */}
+  const form=document.createElement('form');form.method='POST';form.action=APPS_SCRIPT_SIGNUP_URL;form.target=targetName;form.acceptCharset='UTF-8';form.style.display='none';
+  const fields={action:'sendSignupConfirmation',email,password,setupCode};
+  Object.entries(fields).forEach(([name,value])=>{const input=document.createElement('input');input.type='hidden';input.name=name;input.value=value;form.appendChild(input);});
+  document.body.appendChild(form);
+  $('createAccountBtn').disabled=true;$('authStatus').textContent='A new tab is requesting a confirmation email from Google Apps Script. Follow the result shown in that tab. After you confirm the email, return here and sign in.';$('authStatus').className='statusline good';
+  form.submit();form.remove();$('ownerSetupCode').value='';$('createAccountBtn').disabled=false;
 }
 async function signInOwner(){
   if(!supabaseClient){$('authStatus').textContent='Connect your Supabase project first.';return;}
