@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1724">
 <title>FaceCheck | Attendance</title>
-<meta name="application-name" content="FaceCheck v1.2 — Blink calibration and action detection">
+<meta name="application-name" content="FaceCheck v1.3 — Quick controls and manual clock">
 <style>
 :root{color-scheme:dark;--bg:#08131f;--panel:#101f2e;--panel2:#15293a;--line:#284154;--text:#edf7fa;--muted:#93aabe;--mint:#62e6b7;--aqua:#77dcea;--red:#ff8194;--gold:#f3ca74;--shadow:0 22px 65px #0004}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 60% -15%,#214c5c 0,transparent 38%),radial-gradient(ellipse at 0% 45%,#11283b 0,transparent 35%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}body.modal-open{overflow:hidden}button,input{font:inherit}button{cursor:pointer;transition:transform .14s ease,filter .14s ease,background .14s ease}button:active:not(:disabled){transform:scale(.985)}button:disabled{opacity:.42;cursor:not-allowed}.app{max-width:1280px;margin:0 auto;padding:18px 20px 30px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:26px}.brand{display:flex;align-items:center;gap:12px;min-width:210px}.brand-mark{width:48px;height:48px;border:1px solid #5ce7b75c;background:linear-gradient(145deg,#1c554f,#163344);border-radius:16px;display:grid;place-items:center;box-shadow:0 8px 28px #0003}.brand-mark svg{width:30px;height:30px}.brand h1{font-size:25px;letter-spacing:-.055em;margin:0;font-weight:820}.brand p{font-size:11px;color:var(--muted);margin:4px 0 0;letter-spacing:.02em}.top-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}.system-pill{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:#0c1a28bc;border-radius:999px;padding:9px 12px;font-size:11px;color:#c5d7e1;margin-right:3px}.status-dot{width:7px;height:7px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 4px #f3ca7416}.status-dot.good{background:var(--mint);box-shadow:0 0 0 4px #62e6b718}.status-dot.pending{background:var(--gold)}.small{font-size:10px;color:var(--muted)}.nav-btn,.btn{border:1px solid var(--line);border-radius:12px;padding:10px 13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;font-weight:750;font-size:12px;color:#e6f2f7;background:#14283a}.nav-btn svg,.btn svg{width:16px;height:16px;flex:none}.nav-btn:hover,.btn.secondary:hover{background:#1c3549;border-color:#46677d}.nav-btn.primary,.btn.primary{color:#052a28;background:linear-gradient(115deg,var(--mint),var(--aqua));border-color:transparent;box-shadow:0 8px 24px #59d9b715}.nav-btn.primary:hover,.btn.primary:hover{filter:brightness(1.06)}.dashboard{display:flex;flex-direction:column;gap:16px}.hero{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:3px 2px 6px}.hero-copy .eyebrow,.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:9px;font-weight:850;color:var(--mint)}.hero h2{font-size:clamp(24px,3.5vw,35px);line-height:1.04;letter-spacing:-.055em;margin:8px 0 7px}.hero p{font-size:12px;line-height:1.5;color:var(--muted);margin:0;max-width:520px}.stats{display:flex;gap:9px}.stat{min-width:112px;padding:12px 15px;background:linear-gradient(145deg,#122738dd,#0d1d2bde);border:1px solid #284354;border-radius:15px}.stat strong{display:block;font-size:22px;letter-spacing:-.04em;color:var(--mint)}.stat span{display:block;margin-top:3px;font-size:10px;color:var(--muted)}.main-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:16px;align-items:stretch}.panel{background:linear-gradient(160deg,#142638f5,#0e1c2af5);border:1px solid #294457;border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}.panel-head{min-height:56px;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 17px;border-bottom:1px solid #263f50}.panel-head h3{font-size:13px;letter-spacing:-.015em;margin:0;font-weight:780}.tiny-state{font-size:10px;color:var(--muted);padding:6px 9px;border-radius:99px;background:#142b3a;border:1px solid #2b4b5e;white-space:nowrap}.camera-stage{position:relative;aspect-ratio:4/3;min-height:300px;max-height:520px;background:linear-gradient(140deg,#050d15,#0c1824);display:grid;place-items:center;overflow:hidden}video{width:100%;height:100%;object-fit:cover;object-position:center 48%;transform:scaleX(-1);display:block}.camera-stage:after{content:"";pointer-events:none;position:absolute;inset:0;background:linear-gradient(180deg,#07131d55,transparent 24%,transparent 73%,#07131d66)}.placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:22px;color:#89a4b4;z-index:1}.placeholder .camicon{font-size:36px;line-height:1;color:var(--mint)}.placeholder strong{color:#dbe8ed;font-size:14px}.placeholder span{max-width:285px;line-height:1.5;font-size:11px}.oval{pointer-events:none;z-index:2;position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);width:min(56%,280px);height:78%;border:2px dashed #72ecc2bc;border-radius:48% 48% 45% 45%;box-shadow:0 0 0 999px #02070b22}.live{position:absolute;top:13px;left:13px;z-index:3;display:flex;gap:7px;align-items:center;background:#06131bdc;border:1px solid #ffffff27;border-radius:999px;padding:7px 10px;font-size:9px;letter-spacing:.08em;font-weight:800}.dot{width:7px;height:7px;border-radius:50%;background:#647a89}.dot.on{background:var(--mint);box-shadow:0 0 12px #62e6b799}.camera-bottom{padding:14px 16px 16px}.status{display:flex;gap:10px;align-items:flex-start;color:#cfdee5;font-size:11px;line-height:1.5;min-height:42px}.status-icon{width:24px;height:24px;flex:0 0 24px;border-radius:8px;display:grid;place-items:center;color:var(--mint);background:#1b493f}.camera-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:10px}.camera-controls button{margin:0}.btn{min-height:42px;padding:11px 14px}.btn.danger{background:#351f2b;border-color:#704051;color:#ffd9e2}.btn.wide{width:100%}.engine-status{font-size:10px;color:#9ab1c0;margin-top:11px;display:flex;align-items:center;gap:8px}.engine-status .statusline{margin:0!important;padding:0!important;border:0!important;background:transparent!important;color:inherit!important;font-size:10px!important}.challenge-card{height:100%;display:flex;flex-direction:column}.challenge-body{padding:20px;display:flex;flex-direction:column;flex:1}.challenge-top{display:flex;justify-content:space-between;gap:10px;align-items:center}.challenge-visual{width:54px;height:54px;display:grid;place-items:center;border:1px solid #326a61;border-radius:18px;background:linear-gradient(140deg,#173c3b,#153042);color:var(--mint);margin:18px 0 15px}.challenge-visual svg{width:27px;height:27px}.challenge-title{font-size:clamp(25px,3vw,34px);font-weight:850;letter-spacing:-.06em;line-height:1.04;margin:7px 0 10px}.desc{font-size:12px;color:var(--muted);line-height:1.65;margin:0 0 15px;max-width:470px}.action-banner{border:1px solid #2b554f;background:linear-gradient(100deg,#12392f99,#12334a70);border-radius:14px;padding:12px 13px;margin:7px 0 13px;font-size:11px;line-height:1.5;color:#d5f4eb}.progress{display:flex;gap:6px;margin:8px 0 17px}.progress span{height:5px;flex:1;background:#263d4d;border-radius:8px;transition:background .18s}.progress span.ok{background:linear-gradient(90deg,var(--mint),var(--aqua))}.challenge-actions{margin-top:auto;display:flex;flex-direction:column;gap:8px}.challenge-actions button{margin:0}.micro-note{font-size:10px;line-height:1.5;color:#829aaa;margin-top:12px}.bottom-hint{display:flex;gap:9px;align-items:center;justify-content:center;color:#7892a3;font-size:10px;padding:1px 0 0}.bottom-hint svg{width:14px;height:14px;color:var(--mint)}
@@ -16,9 +16,64 @@
 @media(max-width:390px){.nav-btn{font-size:9px;padding:9px 3px}.nav-btn svg{display:none}.fields,.form-grid{grid-template-columns:1fr}.form-grid .field:last-child{grid-column:auto}.account-buttons{grid-template-columns:1fr}.log-tools{grid-template-columns:1fr}.log-tools #exportBtn{grid-column:auto}.camera-controls{grid-template-columns:1fr auto}.hero h2{font-size:25px}}
 @media(max-width:700px){.oval{top:53.5%;width:min(68%,300px);height:80%}.camera-stage video{object-position:center 48%}}
 @media(max-width:420px){.camera-stage{min-height:300px;max-height:62dvh}.oval{width:min(70%,285px);height:79%;top:53.5%}}
+
+/* v1.3: keep every frequently used control above the camera preview */
+.topbar{margin-bottom:10px}
+.top-actions{gap:7px}
+.scan-toolbar{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;margin:0 0 14px;border:1px solid #2a4b5b;border-radius:16px;background:linear-gradient(105deg,#102a38f5,#0d1d2cf5);box-shadow:0 10px 30px #0002}
+.scan-toolbar-label{min-width:105px;display:flex;flex-direction:column;gap:3px}
+.scan-toolbar-label strong{font-size:10px;letter-spacing:.12em;color:var(--mint)}
+.scan-toolbar-label span{font-size:10px;color:var(--muted)}
+.scan-toolbar-buttons{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;flex:1}
+.scan-toolbar-buttons .btn{min-width:0;min-height:38px;padding:9px 11px;font-size:11px}
+.scan-toolbar-buttons #verifyBtn{flex:1.5}
+.scan-toolbar-buttons #cameraBtn{flex:1.1}
+.clock-pill{color:#d5f7ef;border-color:#2d665d;background:#0f302c}
+.clock-pill #clockNowText{font-variant-numeric:tabular-nums;white-space:nowrap}
+#manualClockState{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid #315365;background:#0e2230;font-size:10px;color:#bed1da}
+#manualClockState.manual{border-color:#786038;color:#ffe2a0;background:#382c1c}
+.clock-fields{display:grid;grid-template-columns:1fr;gap:12px}
+.clock-help{font-size:11px;line-height:1.6;color:var(--muted);margin:0}
+.html-lock{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;background:radial-gradient(ellipse at 50% 0%,#1c4c58,#08131f 58%);}
+.html-lock.closed{display:none}
+.html-lock-card{width:min(390px,100%);padding:25px;border:1px solid #365568;border-radius:24px;background:linear-gradient(150deg,#142839,#0b1927);box-shadow:0 30px 100px #0009}
+.html-lock-card .brand-mark{margin-bottom:16px}
+.html-lock-card h2{font-size:24px;letter-spacing:-.04em;margin:0 0 8px}
+.html-lock-card p{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 17px}
+.html-lock-card input{width:100%;min-height:46px;padding:12px;border:1px solid #355064;border-radius:12px;background:#0a1723;color:var(--text);font:inherit;margin-bottom:10px;outline:none}
+.html-lock-card input:focus{border-color:var(--mint);box-shadow:0 0 0 3px #62e6b718}
+.html-lock-card .statusline{display:none;margin-top:10px}
+.html-lock-card .statusline.show{display:block}
+@media(max-width:700px){
+  .topbar{gap:9px;margin-bottom:9px}
+  .top-actions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+  .system-pill{grid-column:1/-1;width:max-content;padding:6px 9px;margin:0 0 2px}.clock-pill{grid-column:1/-1}
+  .nav-btn{font-size:9px;min-height:36px;padding:8px 3px;gap:3px;white-space:normal;line-height:1.1}
+  .nav-btn svg{width:13px;height:13px}
+  .scan-toolbar{display:block;padding:8px;margin-bottom:10px}
+  .scan-toolbar-label{display:none}
+  .scan-toolbar-buttons{display:grid;grid-template-columns:1.15fr .55fr 1.5fr;gap:5px}
+  .scan-toolbar-buttons .btn{min-height:42px;padding:7px 4px;font-size:10px;line-height:1.15;white-space:normal}
+  .hero{margin-bottom:7px}
+}
+@media(max-width:390px){
+  .top-actions{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .nav-btn{font-size:8px;padding:7px 2px}
+  .scan-toolbar-buttons{grid-template-columns:1.1fr .48fr 1.42fr}
+  .scan-toolbar-buttons .btn{font-size:9px}
+}
+
 </style>
 </head>
 <body>
+<div class="html-lock" id="htmlLock" role="dialog" aria-modal="true" aria-labelledby="htmlLockTitle">
+  <section class="html-lock-card">
+    <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M5 12.5C5 8.9 7.9 6 11.5 6S18 8.9 18 12.5 15.1 19 11.5 19 5 16.1 5 12.5Z" stroke="#72ecc2" stroke-width="2"/><path d="M14.5 17.2 22 25l5-5" stroke="#72ecc2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="eyebrow">PRIVATE KIOSK</div><h2 id="htmlLockTitle">Unlock FaceCheck</h2><p>Enter the kiosk password to open this attendance screen.</p>
+    <form id="htmlLockForm"><input id="htmlLockPassword" type="password" autocomplete="current-password" placeholder="Kiosk password" aria-label="Kiosk password" required><button class="btn primary wide" type="submit">Unlock FaceCheck</button></form>
+    <div class="statusline warn" id="htmlLockStatus" role="alert">Password required.</div>
+  </section>
+</div>
 <div class="app">
   <header class="topbar">
     <div class="brand">
@@ -27,12 +82,24 @@
     </div>
     <div class="top-actions">
       <div class="system-pill"><span class="status-dot pending" id="systemDot"></span><span id="systemLabel">Connecting</span></div>
+      <div class="system-pill clock-pill"><span class="status-dot good"></span><span id="clockNowText">Loading time…</span></div>
       <button class="nav-btn primary" data-open-modal="employeeModal" aria-label="Add employee"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>Add employee</button>
       <button class="nav-btn" data-open-modal="employeesModal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.3"/><path d="M3 20c0-3.1 2.4-5.2 6-5.2s6 2.1 6 5.2M16 5.4a3.3 3.3 0 0 1 0 6.4M17.2 14.8c2.3.5 3.8 2.3 3.8 5.2" stroke-linecap="round"/></svg>Employees</button>
       <button class="nav-btn" data-open-modal="attendanceModal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M7.5 2.5v4M16.5 2.5v4M3.5 9h17M7.5 13h3M7.5 16.5h7" stroke-linecap="round"/></svg>Reports</button>
       <button class="nav-btn" data-open-modal="accountModal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.5-3.5 3.2-5.5 7.5-5.5s7 2 7.5 5.5" stroke-linecap="round"/></svg>Account</button>
+      <button class="nav-btn" data-open-modal="timeModal" aria-label="Attendance time settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg>Time</button>
     </div>
   </header>
+
+  <div class="scan-toolbar" id="scanToolbar" aria-label="Quick attendance controls">
+    <div class="scan-toolbar-label"><strong>QUICK ACTIONS</strong><span>Every scan control stays above the camera</span></div>
+    <div class="scan-toolbar-buttons">
+      <button class="btn primary" id="cameraBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6.5" width="13" height="11" rx="2"/><path d="m16 10 5-3v10l-5-3" stroke-linejoin="round"/></svg>Start camera</button>
+      <button class="btn secondary" id="stopBtn" disabled>Stop</button>
+      <button class="btn primary" id="verifyBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 10V7a4 4 0 0 1 8 0v3M5 10h14v10H5z"/><path d="m9 15 2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>Verify · Time In / Out</button>
+      <button class="btn secondary" id="retryBtn" hidden>Retry check</button>
+    </div>
+  </div>
 
   <main class="dashboard">
     <section class="hero">
@@ -46,7 +113,6 @@
         <div class="camera-stage"><video id="video" autoplay muted playsinline></video><div class="placeholder" id="placeholder"><div class="camicon">◎</div><strong>Ready when you are</strong><span>Start the camera and center your face inside the outline.</span></div><div class="oval" id="oval" hidden></div><div class="live"><span class="dot" id="dot"></span><span id="liveLabel">CAMERA OFF</span></div></div>
         <div class="camera-bottom">
           <div class="status"><div class="status-icon">✦</div><div id="statusText" role="status" aria-live="polite">Start the front camera. The face engine loads automatically after camera permission is granted.</div></div>
-          <div class="camera-controls"><button class="btn primary" id="cameraBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6.5" width="13" height="11" rx="2"/><path d="m16 10 5-3v10l-5-3" stroke-linejoin="round"/></svg>Start camera</button><button class="btn secondary" id="stopBtn" disabled>Stop</button></div>
           <div class="engine-status"><span class="status-dot pending"></span><span id="engineStatus">Face engine not loaded</span></div>
         </div>
       </section>
@@ -60,14 +126,13 @@
           <p class="desc" id="challengeDesc">Each attempt chooses a random action, such as blinking once, blinking twice, or turning your head and returning to center.</p>
           <div class="action-banner" id="actionBanner">No button is needed after the challenge. FaceCheck captures a set of face descriptors and matches them with a registered employee.</div>
           <div class="progress"><span id="p1"></span><span id="p2"></span><span id="p3"></span></div>
-          <div class="challenge-actions"><button class="btn primary wide" id="verifyBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 10V7a4 4 0 0 1 8 0v3M5 10h14v10H5z"/><path d="m9 15 2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>Verify face · Time In / Time Out</button><button class="btn secondary wide" id="retryBtn" hidden>Try another random check</button></div>
           <p class="micro-note">Time In and Time Out alternate after successful face verification. Blink and head-turn challenges provide basic liveness checks, not a guarantee against every spoofing method.</p>
         </div>
       </section>
     </div>
     <div class="bottom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 19 6v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>Employee records, face templates, and attendance history are managed from the pop-up panels above.</div>
   </main>
-  <footer>FaceCheck Attendance</footer>
+  <footer>FaceCheck Attendance · v1.3</footer>
 </div>
 
 <!-- Employee registration modal -->
@@ -135,6 +200,21 @@
   </section>
 </div>
 
+<!-- Manual attendance clock settings -->
+<div class="modal-backdrop" id="timeModal" hidden>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="timeModalTitle">
+    <div class="modal-head"><div><div class="eyebrow">ATTENDANCE CLOCK</div><h2 id="timeModalTitle">Set the attendance time</h2><p>Set a manual starting date and time for this kiosk. The clock continues counting forward after you apply it.</p></div><button class="icon-btn" data-close-modal="timeModal" aria-label="Close">×</button></div>
+    <div class="modal-body">
+      <div id="manualClockState">Using the device's current time</div>
+      <div class="field" style="margin-top:15px"><label for="timeBaseInput">Manual date and time</label><input id="timeBaseInput" type="datetime-local" step="1"></div>
+      <p class="clock-help">The selected time is used for new Time In / Time Out events and attendance-day checks. This setting is saved in this browser on this device; it does not change your phone's system clock or other kiosks.</p>
+      <div class="account-buttons" style="margin-top:16px"><button class="btn primary" id="applyTimeBaseBtn">Apply manual time</button><button class="btn secondary" id="useDeviceTimeBtn">Use device time</button></div>
+      <div class="statusline" id="timeSettingsStatus" role="status">Attendance timestamps currently use the device clock.</div>
+    </div>
+    <div class="modal-footer"><span>Manual clock affects future attendance records only.</span><button class="btn secondary" data-close-modal="timeModal">Close</button></div>
+  </section>
+</div>
+
 <!-- Replacement confirmation uses a designed modal instead of the browser's plain confirm popup. -->
 <div class="modal-backdrop" id="confirmModal" hidden>
   <section class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
@@ -153,14 +233,30 @@ const video = $('video');
 const SUPABASE_URL = 'https://ppqmytbkqxluexrovccw.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_bnrXdg0t7mriqgxAFDG1Dg_0ifip08N';
 // Paste your deployed Google Apps Script Web App URL ending in /exec here. This is a public endpoint URL, not a secret.
-const APPS_SCRIPT_SIGNUP_URL = 'https://script.google.com/macros/s/AKfycbyrSTMtfOKEKpbZH7nElRGCpWkWby61jfPTlo35B_H89qfxsgIonvlVYadNQXptZhjnDA/exec';
+const APPS_SCRIPT_SIGNUP_URL = 'https://script.google.com/macros/s/AKfycbzcsWeiK4cvoxNAAYos-RoVK1zaDpTM0uU-ErmWOcMhZW5kb4Q_TezBsa4C6r1Z2FJr1A/exec';
 const TABLE_EMPLOYEES = 'facecheck_employees';
 const TABLE_TEMPLATES = 'facecheck_face_templates';
 const TABLE_ATTENDANCE = 'facecheck_attendance';
 const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
 const FACE_MATCH_THRESHOLD = 0.54; // Prototype threshold; calibrate using real testing before production.
+// HTML-only kiosk password: change this value before publishing. It is a convenience gate,
+// NOT database security; this value is visible to anyone who can read the public HTML source.
+const HTML_ONLY_PASSWORD = 'FaceCheck#2026';
+const CLOCK_STORAGE_KEY = 'facecheck_manual_clock_v13';
 const detOpts = () => new window.faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.32 });
 function minimumFaceWidth(){return Math.max(68, (video.videoWidth||480)*0.13);}
+let manualClockBase = loadJson(CLOCK_STORAGE_KEY, null);
+function effectiveNow(){
+  if(manualClockBase && Number.isFinite(Date.parse(manualClockBase.baseISO)) && Number.isFinite(Number(manualClockBase.realStartMs))){
+    return new Date(Date.parse(manualClockBase.baseISO) + Math.max(0, Date.now()-Number(manualClockBase.realStartMs)));
+  }
+  return new Date();
+}
+function isManualClock(){return !!(manualClockBase && Number.isFinite(Date.parse(manualClockBase.baseISO)) && Number.isFinite(Number(manualClockBase.realStartMs)));}
+function localDateTimeInputValue(d=effectiveNow()){const pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;}
+function updateClockDisplay(){const now=effectiveNow();const el=$('clockNowText');if(el)el.textContent=now.toLocaleString([], {month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});const state=$('manualClockState');if(state){state.classList.toggle('manual',isManualClock());state.textContent=isManualClock()?'Manual attendance clock active':'Using the device current time';}const status=$('timeSettingsStatus');if(status)status.textContent=isManualClock()?`Manual time active: ${now.toLocaleString()}. New attendance events use this clock.`:'Attendance timestamps use the device clock.';}
+function applyManualClock(){const value=$('timeBaseInput').value;const selected=new Date(value);if(!value||Number.isNaN(selected.getTime())){$('timeSettingsStatus').textContent='Choose a valid date and time first.';$('timeSettingsStatus').className='statusline warn';return;}manualClockBase={baseISO:selected.toISOString(),realStartMs:Date.now()};saveJson(CLOCK_STORAGE_KEY,manualClockBase);$('timeSettingsStatus').className='statusline good';updateClockDisplay();setStatus(`Manual attendance time set to ${effectiveNow().toLocaleString()}.`);$('timeBaseInput').value=localDateTimeInputValue();}
+function useDeviceClock(){manualClockBase=null;localStorage.removeItem(CLOCK_STORAGE_KEY);$('timeSettingsStatus').className='statusline good';updateClockDisplay();$('timeBaseInput').value=localDateTimeInputValue();setStatus('Attendance time is back to the device clock.');}
 let stream = null, modelsReady = false, modelsPromise = null, flowRunning = false, cameraBusy = false, retryMode = null;
 let employees = [], attendance = [], lastCaptureUrl = null;
 let supabaseClient = null, currentSession = null, cloudReady = false;
@@ -177,7 +273,7 @@ function setCameraBadge(on, label) { $('dot').classList.toggle('on', on); $('liv
 function setProgress(n) { ['p1','p2','p3'].forEach((id,i)=>$(id).classList.toggle('ok', i<n)); }
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 function escapeText(v) { return String(v ?? ''); }
-function localDateKey(date = new Date()) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
+function localDateKey(date = effectiveNow()) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
 function formatTime(iso) { const d=new Date(iso); return d.toLocaleString([], {month:'short',day:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
 function renderEmployees() {
   const root=$('employeeList'); root.replaceChildren(); $('employeeCount').textContent=`${employees.length} employees`; $('dashboardEmployeeCount').textContent=employees.length; $('reportEmployeeCount').textContent=employees.length;
@@ -221,6 +317,20 @@ function askConfirmation(title,message,confirmLabel='Confirm'){
 function finishConfirmation(accepted){
   const resolve=confirmResolver;confirmResolver=null;closeModal('confirmModal');if(resolve)resolve(accepted);
 }
+function setupHtmlPasswordGate(){
+  const lock=$('htmlLock');if(!lock)return;
+  if(sessionStorage.getItem('facecheck_html_unlocked')==='1')lock.classList.add('closed');
+  const form=$('htmlLockForm');form.addEventListener('submit',event=>{event.preventDefault();const entered=$('htmlLockPassword').value;if(entered===HTML_ONLY_PASSWORD){sessionStorage.setItem('facecheck_html_unlocked','1');lock.classList.add('closed');$('htmlLockPassword').value='';}else{$('htmlLockStatus').textContent='Incorrect kiosk password. Try again.';$('htmlLockStatus').classList.add('show');$('htmlLockPassword').select();}});
+  $('htmlLockPassword').addEventListener('input',()=>$('htmlLockStatus').classList.remove('show'));
+}
+function setupTimeSettings(){
+  $('timeBaseInput').value=localDateTimeInputValue();
+  $('applyTimeBaseBtn').addEventListener('click',applyManualClock);
+  $('useDeviceTimeBtn').addEventListener('click',useDeviceClock);
+  updateClockDisplay();
+  setInterval(updateClockDisplay,1000);
+}
+
 function setupModalControls(){
   document.querySelectorAll('[data-open-modal]').forEach(btn=>btn.addEventListener('click',()=>openModal(btn.dataset.openModal)));
   document.querySelectorAll('[data-close-modal]').forEach(btn=>btn.addEventListener('click',()=>closeModal(btn.dataset.closeModal)));
@@ -468,11 +578,12 @@ function calcDistance(a,b){if(!a||!b||a.length!==b.length)return Infinity;let su
 function findBestMatch(querySamples){let best=null;for(const e of employees){const samples=(e.samples||[]);const distances=querySamples.map(q=>Math.min(...samples.map(s=>calcDistance(q,s))));const sorted=distances.sort((a,b)=>a-b);const score=sorted[Math.floor(sorted.length/2)]??Infinity;if(!best||score<best.distance)best={employee:e,distance:score};}return best;}
 async function recordAttendance(employee, challengeId, matchDistance){
   if(!supabaseClient||!currentSession||!cloudReady)throw new Error('Open Account and sign in before recording attendance.');
-  const today=localDateKey();
+  const attendanceTime=effectiveNow();
+  const today=localDateKey(attendanceTime);
   const todays=attendance.filter(r=>r.employeeId===employee.id&&localDateKey(new Date(r.timestamp))===today).sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
   const last=todays[todays.length-1];
   const event=last?.event==='TIME_IN'?'TIME_OUT':'TIME_IN';
-  const payload={owner_id:currentSession.user.id,employee_id:employee.dbId,event_type:event,match_distance:matchDistance,liveness_challenge:challengeId,source:'android-kiosk-prototype'};
+  const payload={owner_id:currentSession.user.id,employee_id:employee.dbId,event_type:event,occurred_at:attendanceTime.toISOString(),match_distance:matchDistance,liveness_challenge:challengeId,source:isManualClock()?'android-kiosk-manual-clock':'android-kiosk-prototype'};
   const {data,error}=await supabaseClient.from(TABLE_ATTENDANCE).insert(payload).select('id,employee_id,event_type,occurred_at,match_distance,liveness_challenge,source').single();
   if(error)throw error;
   const row={dbId:data.id,employeeId:employee.id,name:employee.name,event:data.event_type,timestamp:data.occurred_at,source:data.source,matchDistance:data.match_distance,challengeId:data.liveness_challenge};
@@ -566,7 +677,7 @@ async function exportExcel(){
     const recordsByEmployee=new Map(employeeSorted.map(e=>[e.id,allRows.filter(r=>r.employeeId===e.id)]));
     const summary=workbook.addWorksheet('Summary',{properties:{tabColor:{argb:'FF137C77'}}});
     summary.columns=[{width:19},{width:28},{width:16},{width:15},{width:15},{width:23},{width:23},{width:20}];
-    styleTitleRow(summary,{title:'A1:H1',subtitle:'A2:H2'},'FACECHECK | ATTENDANCE REPORT',`Generated ${new Date().toLocaleString()} · Complete records currently available to this account`);
+    styleTitleRow(summary,{title:'A1:H1',subtitle:'A2:H2'},'FACECHECK | ATTENDANCE REPORT',`Generated ${effectiveNow().toLocaleString()} · Complete records currently available to this account`);
     summary.getCell('A4').value='Employees registered';summary.getCell('B4').value=employeeSorted.length;summary.getCell('D4').value='Attendance events';summary.getCell('E4').value=allRows.length;
     ['A4','D4'].forEach(addr=>{summary.getCell(addr).font={bold:true,color:{argb:'FF315366'}};summary.getCell(addr).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE6F2F1'}};});
     ['B4','E4'].forEach(addr=>{summary.getCell(addr).font={bold:true,size:13,color:{argb:'FF0F766E'}};summary.getCell(addr).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF2F9F8'}};});
@@ -699,7 +810,7 @@ async function signOutOwner(){
   const {error}=await supabaseClient.auth.signOut();if(error){$('authStatus').textContent=`Sign out failed: ${error.message}`;return;}
   currentSession=null;cloudReady=false;employees=[];attendance=[];renderEmployees();renderAttendance();updateAuthUi();refreshButtons();$('cloudBadge').textContent='Sign in required';$('cloudStatus').textContent='Signed out. Employee and attendance records remain saved.';updateTopStatus();
 }
-setupModalControls();$('cameraBtn').addEventListener('click',startCameraAndModels);$('stopBtn').addEventListener('click',stopCamera);$('enrollBtn').addEventListener('click',enroll);$('verifyBtn').addEventListener('click',verifyAndClock);$('retryBtn').addEventListener('click',()=>{const mode=retryMode;$('retryBtn').hidden=true;if(mode==='enroll')enroll();else verifyAndClock();});$('exportBtn').addEventListener('click',exportExcel);$('exportCsvBtn').addEventListener('click',exportCsv);$('refreshBtn').addEventListener('click',async()=>{const b=$('refreshBtn');b.disabled=true;b.textContent='Refreshing…';$('reportStatus').textContent='Refreshing employee and attendance records…';try{await loadCloudData();$('reportStatus').textContent=cloudReady?'Attendance and employee records refreshed.':$('cloudStatus').textContent;}finally{b.disabled=false;b.textContent='Refresh';}});$('createAccountBtn').addEventListener('click',createOwnerAccount);$('signInBtn').addEventListener('click',signInOwner);$('signOutBtn').addEventListener('click',signOutOwner);
+setupHtmlPasswordGate();setupTimeSettings();setupModalControls();$('cameraBtn').addEventListener('click',startCameraAndModels);$('stopBtn').addEventListener('click',stopCamera);$('enrollBtn').addEventListener('click',enroll);$('verifyBtn').addEventListener('click',verifyAndClock);$('retryBtn').addEventListener('click',()=>{const mode=retryMode;$('retryBtn').hidden=true;if(mode==='enroll')enroll();else verifyAndClock();});$('exportBtn').addEventListener('click',exportExcel);$('exportCsvBtn').addEventListener('click',exportCsv);$('refreshBtn').addEventListener('click',async()=>{const b=$('refreshBtn');b.disabled=true;b.textContent='Refreshing…';$('reportStatus').textContent='Refreshing employee and attendance records…';try{await loadCloudData();$('reportStatus').textContent=cloudReady?'Attendance and employee records refreshed.':$('cloudStatus').textContent;}finally{b.disabled=false;b.textContent='Refresh';}});$('createAccountBtn').addEventListener('click',createOwnerAccount);$('signInBtn').addEventListener('click',signInOwner);$('signOutBtn').addEventListener('click',signOutOwner);
 // Project URL and publishable key are configured in source. No key-entry UI or secret key is used.
 // Create the capture image elements in the camera flow's status UI without saving images persistently.
 const style=document.createElement('style');style.textContent='.captured-mini{display:none;width:88px;height:66px;object-fit:cover;border-radius:8px;border:1px solid #34475d}';document.head.append(style);
